@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [developer, test, main]
+  push:
+    branches: [developer, test, main]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # lint corrige lo que puede; si cambia algo, el PR no estaba limpio
+      - run: npm run lint && git diff --exit-code
+      - run: npm test
+      - run: npm run build
