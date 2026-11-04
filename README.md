@@ -6,19 +6,38 @@ Stack: Vue 3 + Vite (TypeScript), Vue Router, Pinia, Tailwind CSS y Vitest.
 
 ## Requisitos
 
-- Node.js 24 (con [fnm](https://github.com/Schniz/fnm): `fnm use` lee `.nvmrc`)
+- Node.js 24 (con [nvm](https://github.com/nvm-sh/nvm) o [fnm](https://github.com/Schniz/fnm); ambos leen `.nvmrc`)
 - La API ([RedNexus-Backend](https://github.com/juanjosegl/RedNexus-Backend)) corriendo en `http://localhost:3000`
+
+**¿Primera vez?** Sigue la [guía del equipo](https://github.com/juanjosegl/RedNexus-Platform/blob/developer/docs/guia-del-equipo.md); las tareas están en [tareas.md](https://github.com/juanjosegl/RedNexus-Platform/blob/developer/docs/tareas.md).
 
 ## Arranque
 
-```bash
-git checkout developer
-cp .env.example .env
-npm install
-npm run dev                   # http://localhost:5173
-```
+1. **Levanta el backend con Docker**, sin instalar nada del backend. En RedNexus-Platform:
 
-La página de inicio muestra `API: ok` cuando el backend responde.
+   ```bash
+   docker compose up -d --build api worker   # API en http://localhost:3000, con datos de prueba
+   ```
+
+2. **Arranca el frontend** en este repo:
+
+   ```bash
+   git checkout developer
+   cp .env.example .env
+   npm install
+   npm run dev                   # http://localhost:5173
+   ```
+
+La página de inicio muestra `API: ok` cuando el backend responde. Los endpoints disponibles, con lo que reciben y responden, están en **http://localhost:3000/api/docs** (Swagger).
+
+Cuando el equipo de backend fusione cambios, actualízalos con `git pull` en RedNexus-Backend y repite el paso 1.
+
+El frontend siempre llama a la API con rutas relativas (`/api/...`):
+
+- **En desarrollo:** Vite reenvía `/api` a `http://localhost:3000` (ver `server.proxy` en `vite.config.ts`).
+- **En Docker y Kubernetes:** Nginx reenvía `/api` al servicio indicado en `API_UPSTREAM` (ver `nginx.conf.template`).
+
+Así la misma imagen sirve en cualquier ambiente. La imagen corre Nginx sin root en el puerto 8080.
 
 ## Estructura
 
@@ -47,7 +66,7 @@ src/
 | `test` | QA. Entra por PR desde `developer`. |
 | `developer` | Integración diaria. Entra por PR desde `feature/*` o `fix/*`. |
 
-Flujo: `git checkout developer && git pull`, luego `git checkout -b feature/RN-12-descripcion`, commits con [Conventional Commits](https://www.conventionalcommits.org/es/) (`feat: ...`, `fix: ...`) y PR hacia `developer`.
+Flujo: `git switch developer && git pull`, luego `git switch -c feature/FE-02-login-registro` (tipo/ID-de-la-tarea-descripcion), commits como `feat(auth): vistas de login y registro` y PR hacia `developer`. Reglas completas en [CONTRIBUTING](https://github.com/juanjosegl/RedNexus-Platform/blob/developer/CONTRIBUTING.md).
 
 ## Scripts
 
