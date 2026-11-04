@@ -9,6 +9,11 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
     },
+    {
+      path: '/perfil',
+      name: 'profile',
+      component: () => import('@/features/profile/ProfileView.vue'),
+    },
     // Cada feature agrega sus rutas aqui con carga diferida, por ejemplo:
     // { path: '/login', name: 'login', component: () => import('@/features/auth/LoginView.vue') },
   ],
