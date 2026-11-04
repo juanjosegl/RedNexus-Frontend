@@ -14,7 +14,7 @@ withDefaults(
   <button
     :type="type"
     :disabled="loading"
-    class="min-h-11 w-full rounded-md px-4 py-2 font-medium focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+    class="min-h-11 w-full rounded-md bg-gray-900 px-4 py-2 font-medium text-white transition-colors hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
   >
     <slot />
   </button>

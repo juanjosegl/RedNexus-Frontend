@@ -26,7 +26,12 @@ defineProps<{
       :aria-invalid="!!error"
       :aria-describedby="error ? `${id}-error` : undefined"
       v-bind="$attrs"
-      class="min-h-11 rounded-md border border-gray-300 px-3 py-2 focus-visible:outline-none focus-visible:ring-2"
+      :class="
+        error
+          ? 'border-red-500 focus-visible:ring-red-500'
+          : 'border-gray-300 focus-visible:ring-gray-900'
+      "
+      class="min-h-11 rounded-md border px-3 py-2 focus-visible:outline-none"
     />
     <p v-if="error" :id="`${id}-error`" role="alert" class="text-sm text-red-600">
       {{ error }}
