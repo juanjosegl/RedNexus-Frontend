@@ -1,16 +1,70 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
+import logoFull from '@/assets/logo/logo-rednexus.svg'
+import logoMark from '@/assets/logo/logo-mark.svg'
+import { useSessionStore } from '@/stores/session'
+
+const session = useSessionStore()
+const router = useRouter()
+
+function handleLogout() {
+  session.logout()
+  router.push('/login')
+}
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-900">
-    <header class="border-b border-slate-200 bg-white">
-      <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <RouterLink to="/" class="text-lg font-semibold">RedNexus</RouterLink>
+  <div>
+    <header class="app-header">
+      <nav aria-label="Principal" class="container">
+        <RouterLink class="brand" to="/">
+          <img class="brand-full" :src="logoFull" alt="RedNexus" />
+          <img class="brand-mark" :src="logoMark" alt="RedNexus" />
+        </RouterLink>
+
+        <div class="nav-links">
+          <template v-if="!session.isLoggedIn">
+            <RouterLink to="/login" class="nav-link" active-class="is-active">
+              Iniciar sesión
+            </RouterLink>
+            <RouterLink to="/register" class="nav-link" active-class="is-active">
+              Registrarse
+            </RouterLink>
+          </template>
+
+          <template v-else>
+            <RouterLink to="/help-requests" class="nav-link" active-class="is-active">
+              Solicitudes
+            </RouterLink>
+            <RouterLink to="/perfil" class="nav-link" active-class="is-active">
+              {{ session.user?.name ?? 'Perfil' }}
+            </RouterLink>
+            <button type="button" class="nav-link nav-button" @click="handleLogout">
+              Cerrar sesión
+            </button>
+          </template>
+        </div>
       </nav>
     </header>
-    <main class="mx-auto max-w-5xl px-4 py-8">
+
+    <main class="page container">
       <slot />
     </main>
   </div>
 </template>
+
+<style scoped>
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.nav-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+</style>

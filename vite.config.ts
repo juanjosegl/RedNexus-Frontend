@@ -13,4 +13,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    // En desarrollo, /api va a la API local (npm run start:dev en RedNexus-Backend)
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
+  },
 })
