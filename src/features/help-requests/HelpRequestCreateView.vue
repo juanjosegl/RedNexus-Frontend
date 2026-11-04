@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseTextarea from '@/components/BaseTextarea.vue'
+import VoiceNoteRecorder from './VoiceNoteRecorder.vue'
 import { createHelpRequest } from './api'
 import { helpRequestErrorMessage } from './errors'
 
@@ -53,6 +54,7 @@ async function submit() {
         :disabled="submitting"
         required
       />
+      <VoiceNoteRecorder />
       <p v-if="alertMessage" class="alert">{{ alertMessage }}</p>
       <div class="actions">
         <BaseButton type="submit" :disabled="submitting">Publicar</BaseButton>
