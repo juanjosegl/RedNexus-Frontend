@@ -33,56 +33,51 @@ async function handleLogin() {
 </script>
 
 <template>
-  <section class="mx-auto max-w-md rounded-xl bg-white p-8 text-slate-900 shadow-sm">
-    <h1 class="mb-2 text-2xl font-bold">Iniciar sesión</h1>
-
-    <p class="mb-6 text-sm text-slate-500">
-      Bienvenido de nuevo a RedNexus.
-    </p>
-
-    <form class="space-y-4" @submit.prevent="handleLogin">
+  <section class="panel">
+    <div class="page-head">
       <div>
-        <label class="mb-1 block text-sm font-medium">Correo electrónico</label>
+        <h1>Iniciar sesión</h1>
+        <p class="meta">Bienvenido de nuevo a RedNexus.</p>
+      </div>
+    </div>
+
+    <form class="form" @submit.prevent="handleLogin">
+      <div class="field">
+        <label for="login-email">Correo electrónico</label>
         <input
+          id="login-email"
           v-model="email"
           type="email"
           required
           autocomplete="email"
-          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+          class="input"
           placeholder="correo@ejemplo.com"
         />
       </div>
 
-      <div>
-        <label class="mb-1 block text-sm font-medium">Contraseña</label>
+      <div class="field">
+        <label for="login-password">Contraseña</label>
         <input
+          id="login-password"
           v-model="password"
           type="password"
           required
           autocomplete="current-password"
-          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+          class="input"
           placeholder="Tu contraseña"
         />
       </div>
 
-      <p v-if="error" class="text-sm text-red-600">
-        {{ error }}
-      </p>
+      <p v-if="error" class="alert">{{ error }}</p>
 
-      <button
-        type="submit"
-        :disabled="loading"
-        class="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-      >
+      <button type="submit" class="btn" data-variant="primary" :disabled="loading">
         {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
       </button>
     </form>
 
-    <p class="mt-6 text-center text-sm text-slate-600">
+    <p class="meta">
       ¿No tienes cuenta?
-      <RouterLink to="/register" class="font-medium text-blue-600">
-        Regístrate
-      </RouterLink>
+      <RouterLink to="/register">Regístrate</RouterLink>
     </p>
   </section>
 </template>
