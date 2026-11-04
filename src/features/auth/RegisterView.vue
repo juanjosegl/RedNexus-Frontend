@@ -35,73 +35,69 @@ async function handleRegister() {
 </script>
 
 <template>
-  <section class="mx-auto max-w-md rounded-xl bg-white p-8 text-slate-900 shadow-sm">
-    <h1 class="mb-2 text-2xl font-bold">Crear cuenta</h1>
-
-    <p class="mb-6 text-sm text-slate-500">
-      Únete a la comunidad académica de RedNexus.
-    </p>
-
-    <form class="space-y-4" @submit.prevent="handleRegister">
+  <section class="panel">
+    <div class="page-head">
       <div>
-        <label class="mb-1 block text-sm font-medium">Nombre completo</label>
+        <h1>Crear cuenta</h1>
+        <p class="meta">Únete a la comunidad académica de RedNexus.</p>
+      </div>
+    </div>
+
+    <form class="form" @submit.prevent="handleRegister">
+      <div class="field">
+        <label for="register-name">Nombre completo</label>
         <input
+          id="register-name"
           v-model="name"
           type="text"
           required
           minlength="2"
           maxlength="80"
           autocomplete="name"
-          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+          class="input"
           placeholder="Tu nombre"
         />
       </div>
 
-      <div>
-        <label class="mb-1 block text-sm font-medium">Correo electrónico</label>
+      <div class="field">
+        <label for="register-email">Correo electrónico</label>
         <input
+          id="register-email"
           v-model="email"
           type="email"
           required
           maxlength="120"
           autocomplete="email"
-          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+          class="input"
           placeholder="correo@ejemplo.com"
         />
       </div>
 
-      <div>
-        <label class="mb-1 block text-sm font-medium">Contraseña</label>
+      <div class="field">
+        <label for="register-password">Contraseña</label>
         <input
+          id="register-password"
           v-model="password"
           type="password"
           required
           minlength="8"
           maxlength="72"
           autocomplete="new-password"
-          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+          class="input"
           placeholder="Mínimo 8 caracteres"
         />
       </div>
 
-      <p v-if="error" class="text-sm text-red-600">
-        {{ error }}
-      </p>
+      <p v-if="error" class="alert">{{ error }}</p>
 
-      <button
-        type="submit"
-        :disabled="loading"
-        class="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-      >
+      <button type="submit" class="btn" data-variant="primary" :disabled="loading">
         {{ loading ? 'Creando cuenta...' : 'Registrarme' }}
       </button>
     </form>
 
-    <p class="mt-6 text-center text-sm text-slate-600">
+    <p class="meta">
       ¿Ya tienes cuenta?
-      <RouterLink to="/login" class="font-medium text-blue-600">
-        Inicia sesión
-      </RouterLink>
+      <RouterLink to="/login">Inicia sesión</RouterLink>
     </p>
   </section>
 </template>
