@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import logoFull from '@/assets/logo/logo-rednexus.svg'
+import logoMark from '@/assets/logo/logo-mark.svg'
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-900">
-    <header class="border-b border-slate-200 bg-white">
-      <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <RouterLink to="/" class="text-lg font-semibold">RedNexus</RouterLink>
-      </nav>
+  <div>
+    <header class="app-header">
+      <div class="container">
+        <RouterLink class="brand" to="/help-requests">
+          <img class="brand-full" :src="logoFull" alt="RedNexus" />
+          <img class="brand-mark" :src="logoMark" alt="RedNexus" />
+        </RouterLink>
+        <RouterLink :to="{ name: 'help-requests' }" class="nav-link" active-class="is-active">
+          Solicitudes
+        </RouterLink>
+      </div>
     </header>
-    <main class="mx-auto max-w-5xl px-4 py-8">
+    <main class="page container">
       <slot />
     </main>
   </div>
