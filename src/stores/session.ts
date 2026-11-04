@@ -1,26 +1,57 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import {
+  login as loginRequest,
+  register as registerRequest,
+  getMe,
+  type LoginData,
+  type RegisterData,
+  type User,
+} from '@/features/auth/auth'
 
-const tokenKey = 'rednexus.token'
-
-function readToken(): string | null {
-  return localStorage.getItem(tokenKey)
-}
-
-// The auth feature fills this store on login. The key stays stable so both sides connect.
 export const useSessionStore = defineStore('session', () => {
-  const token = ref<string | null>(readToken())
+  const token = ref<string | null>(localStorage.getItem('rednexus_token'))
+  const user = ref<User | null>(null)
+
   const isLoggedIn = computed(() => token.value !== null)
 
-  function setToken(value: string | null) {
-    token.value = value
-    if (value) localStorage.setItem(tokenKey, value)
-    else localStorage.removeItem(tokenKey)
+  async function login(data: LoginData) {
+    const response = await loginRequest(data)
+    token.value = response.accessToken
+    user.value = response.user
+    localStorage.setItem('rednexus_token', response.accessToken)
+  }
+
+  async function register(data: RegisterData) {
+    const response = await registerRequest(data)
+    token.value = response.accessToken
+    user.value = response.user
+    localStorage.setItem('rednexus_token', response.accessToken)
+  }
+
+  async function loadUser() {
+    if (!token.value) return
+
+    try {
+      user.value = await getMe(token.value)
+    } catch {
+      logout()
+    }
   }
 
   function logout() {
-    setToken(null)
+    token.value = null
+    user.value = null
+    localStorage.removeItem('rednexus_token')
   }
 
-  return { token, isLoggedIn, setToken, logout }
+  return {
+    token,
+    user,
+    isLoggedIn,
+    login,
+    register,
+    loadUser,
+    logout,
+  }
 })

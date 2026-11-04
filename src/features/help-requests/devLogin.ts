@@ -1,4 +1,3 @@
-import { http } from '@/services/http'
 import { useSessionStore } from '@/stores/session'
 
 const demoEmail = 'ana.demo@rednexus.dev'
@@ -7,9 +6,5 @@ const demoPassword = 'demo12345'
 export const devLoginAvailable = import.meta.env.DEV
 
 export async function loginWithDevAccount() {
-  const session = await http<{ accessToken: string }>('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ email: demoEmail, password: demoPassword }),
-  })
-  useSessionStore().setToken(session.accessToken)
+  await useSessionStore().login({ email: demoEmail, password: demoPassword })
 }
