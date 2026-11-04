@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router'
+import logoFull from '@/assets/logo/logo-rednexus.svg'
+import logoMark from '@/assets/logo/logo-mark.svg'
 import { useSessionStore } from '@/stores/session'
 
 const session = useSessionStore()
@@ -12,43 +14,32 @@ function handleLogout() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-900">
-    <header class="border-b border-slate-200 bg-white">
-      <nav
-        aria-label="Principal"
-        class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3"
-      >
-        <RouterLink to="/" class="text-lg font-semibold">
-          RedNexus
+  <div>
+    <header class="app-header">
+      <nav aria-label="Principal" class="container">
+        <RouterLink class="brand" to="/">
+          <img class="brand-full" :src="logoFull" alt="RedNexus" />
+          <img class="brand-mark" :src="logoMark" alt="RedNexus" />
         </RouterLink>
 
-        <div class="flex items-center gap-4">
+        <div class="nav-links">
           <template v-if="!session.isLoggedIn">
-            <RouterLink
-              to="/login"
-              class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
-            >
+            <RouterLink to="/login" class="nav-link" active-class="is-active">
               Iniciar sesión
             </RouterLink>
-
-            <RouterLink
-              to="/register"
-              class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
+            <RouterLink to="/register" class="nav-link" active-class="is-active">
               Registrarse
             </RouterLink>
           </template>
 
           <template v-else>
-            <span class="text-sm text-slate-600">
-              Hola, {{ session.user?.name ?? 'Estudiante' }}
-            </span>
-
-            <button
-              type="button"
-              class="min-h-11 rounded-md px-3 text-sm font-medium text-red-600 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
-              @click="handleLogout"
-            >
+            <RouterLink to="/help-requests" class="nav-link" active-class="is-active">
+              Solicitudes
+            </RouterLink>
+            <RouterLink to="/perfil" class="nav-link" active-class="is-active">
+              {{ session.user?.name ?? 'Perfil' }}
+            </RouterLink>
+            <button type="button" class="nav-link nav-button" @click="handleLogout">
               Cerrar sesión
             </button>
           </template>
@@ -56,8 +47,24 @@ function handleLogout() {
       </nav>
     </header>
 
-    <main class="mx-auto max-w-5xl px-4 py-8">
+    <main class="page container">
       <slot />
     </main>
   </div>
 </template>
+
+<style scoped>
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.nav-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+</style>

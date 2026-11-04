@@ -33,7 +33,7 @@ async function handleLogin() {
 </script>
 
 <template>
-  <section class="mx-auto max-w-md rounded-xl bg-white p-8 shadow-sm">
+  <section class="mx-auto max-w-md rounded-xl bg-white p-8 text-slate-900 shadow-sm">
     <h1 class="mb-2 text-2xl font-bold">Iniciar sesión</h1>
 
     <p class="mb-6 text-sm text-slate-500">

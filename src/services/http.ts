@@ -2,6 +2,17 @@
 // Cliente HTTP centralizado para comunicarse con la API.
 const baseUrl = import.meta.env.VITE_API_URL ?? '/api'
 
+// Conserva el código HTTP para que cada feature decida qué mostrar (401, 403, 404...).
+export class HttpError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message)
+    this.name = 'HttpError'
+  }
+}
+
 export async function http<T>(path: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers)
 
@@ -36,7 +47,7 @@ export async function http<T>(path: string, init?: RequestInit): Promise<T> {
       // Se conserva el mensaje HTTP si la respuesta no contiene JSON.
     }
 
-    throw new Error(message)
+    throw new HttpError(message, res.status)
   }
 
   return res.json() as Promise<T>

@@ -9,7 +9,7 @@ withDefaults(
 </script>
 
 <template>
-  <component :is="as" class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
+  <component :is="as" class="rounded-lg border border-gray-200 bg-white p-4 text-gray-900 shadow-sm md:p-6">
     <slot />
   </component>
 </template>
