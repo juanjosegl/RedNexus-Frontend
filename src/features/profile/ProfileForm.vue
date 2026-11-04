@@ -55,17 +55,12 @@ async function onSubmit() {
 </script>
 
 <template>
-  <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
+  <form class="form" @submit.prevent="onSubmit">
     <BaseInput id="profile-name" v-model="name" label="Nombre" autocomplete="name" required />
 
-    <div class="flex flex-col gap-1">
-      <label for="profile-bio" class="text-sm font-medium">Descripción</label>
-      <textarea
-        id="profile-bio"
-        v-model="bio"
-        rows="4"
-        class="rounded-md border border-gray-300 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
-      />
+    <div class="field">
+      <label for="profile-bio">Descripción</label>
+      <textarea id="profile-bio" v-model="bio" rows="4" class="textarea" />
     </div>
 
     <BaseInput
@@ -77,17 +72,11 @@ async function onSubmit() {
 
     <BaseAlert v-if="error" :message="error" />
 
-    <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
-      <button
-        type="button"
-        class="min-h-11 rounded-md border border-gray-300 px-4 py-2 font-medium hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
-        @click="emit('cancel')"
-      >
+    <div class="actions">
+      <button type="button" class="btn" data-variant="secondary" @click="emit('cancel')">
         Cancelar
       </button>
-      <div class="sm:w-40">
-        <BaseButton :loading="saving">Guardar</BaseButton>
-      </div>
+      <BaseButton :loading="saving">Guardar</BaseButton>
     </div>
   </form>
 </template>
