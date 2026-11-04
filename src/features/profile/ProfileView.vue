@@ -29,8 +29,10 @@ function onSaved(updated: Profile) {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-2xl flex-col gap-4">
-    <h1 class="text-2xl font-bold">Mi perfil</h1>
+  <section>
+    <div class="page-head">
+      <h1>Mi perfil</h1>
+    </div>
 
     <BaseSpinner v-if="loading" />
     <BaseAlert v-else-if="error" :message="error" />
@@ -39,36 +41,28 @@ function onSaved(updated: Profile) {
       <ProfileForm v-if="editing" :profile="profile" @saved="onSaved" @cancel="editing = false" />
 
       <template v-else>
-        <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-          <h2 class="text-xl font-semibold">{{ profile.name }}</h2>
-          <p class="text-sm text-slate-600">
+        <div class="page-head">
+          <h2>{{ profile.name }}</h2>
+          <p class="meta">
             <span aria-hidden="true">★</span>
             <!-- Sin calificaciones todavia no es lo mismo que calificacion 0 -->
             {{ profile.rating !== null ? profile.rating.toFixed(1) : 'Sin calificaciones' }}
           </p>
         </div>
-        <p class="text-sm text-slate-600">{{ profile.email }}</p>
+        <p class="meta">{{ profile.email }}</p>
 
-        <p class="mt-4">{{ profile.bio || 'Aun no has escrito tu descripcion.' }}</p>
+        <p>{{ profile.bio || 'Aun no has escrito tu descripcion.' }}</p>
 
-        <ul v-if="profile.tags.length" class="mt-4 flex flex-wrap gap-2" aria-label="Etiquetas">
-          <li
-            v-for="tag in profile.tags"
-            :key="tag"
-            class="rounded-full bg-slate-100 px-3 py-1 text-sm"
-          >
+        <ul v-if="profile.tags.length" class="tags" aria-label="Etiquetas">
+          <li v-for="tag in profile.tags" :key="tag" class="tag">
             {{ tag }}
           </li>
         </ul>
 
-        <button
-          type="button"
-          class="mt-4 min-h-11 rounded-md border border-gray-300 px-4 py-2 font-medium hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
-          @click="editing = true"
-        >
+        <button type="button" class="btn" data-variant="secondary" @click="editing = true">
           Editar perfil
         </button>
       </template>
     </BaseCard>
-  </div>
+  </section>
 </template>

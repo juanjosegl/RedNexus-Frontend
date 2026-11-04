@@ -17,8 +17,8 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
-    <label :for="id" class="text-sm font-medium">{{ label }}</label>
+  <div class="field">
+    <label :for="id">{{ label }}</label>
     <input
       :id="id"
       v-model="model"
@@ -26,14 +26,10 @@ defineProps<{
       :aria-invalid="!!error"
       :aria-describedby="error ? `${id}-error` : undefined"
       v-bind="$attrs"
-      :class="
-        error
-          ? 'border-red-500 focus-visible:ring-red-500'
-          : 'border-gray-300 focus-visible:ring-gray-900'
-      "
-      class="min-h-11 rounded-md border px-3 py-2 focus-visible:outline-none"
+      class="input"
+      :class="{ 'is-invalid': Boolean(error) }"
     />
-    <p v-if="error" :id="`${id}-error`" role="alert" class="text-sm text-red-600">
+    <p v-if="error" :id="`${id}-error`" role="alert" class="field-error">
       {{ error }}
     </p>
   </div>

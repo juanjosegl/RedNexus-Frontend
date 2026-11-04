@@ -16,7 +16,7 @@ function handleLogout() {
 <template>
   <div>
     <header class="app-header">
-      <nav aria-label="Principal" class="container">
+      <nav aria-label="Principal" class="frame">
         <RouterLink class="brand" to="/">
           <img class="brand-full" :src="logoFull" alt="RedNexus" />
           <img class="brand-mark" :src="logoMark" alt="RedNexus" />
@@ -47,7 +47,7 @@ function handleLogout() {
       </nav>
     </header>
 
-    <main class="page container">
+    <main class="page frame">
       <slot />
     </main>
   </div>
