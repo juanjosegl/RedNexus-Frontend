@@ -1,16 +1,30 @@
 import { describe, it, expect } from 'vitest'
 import { RouterLinkStub, mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import DefaultLayout from '../DefaultLayout.vue'
 import { useSessionStore } from '@/stores/session'
 
-// Monta el layout con un store limpio por prueba y sin router real
 function mountLayout() {
   const pinia = createPinia()
+
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/', component: { template: '<div />' } },
+      { path: '/login', component: { template: '<div />' } },
+      { path: '/register', component: { template: '<div />' } },
+    ],
+  })
+
   const wrapper = mount(DefaultLayout, {
-    global: { plugins: [pinia], stubs: { RouterLink: RouterLinkStub } },
+    global: {
+      plugins: [pinia, router],
+      stubs: { RouterLink: RouterLinkStub },
+    },
     slots: { default: 'Contenido' },
   })
+
   return { wrapper, session: useSessionStore(pinia) }
 }
 
