@@ -46,6 +46,7 @@ defineExpose({ send })
   <section class="support">
     <div class="page-head">
       <h1>Ayuda</h1>
+      <BaseButton variant="secondary" :to="{ name: 'pqrs' }">Radicar una PQRS</BaseButton>
     </div>
     <p class="intro">
       Pregúntale al asistente de RedNexus cómo usar la plataforma: registro, solicitudes de ayuda,
