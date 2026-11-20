@@ -5,7 +5,6 @@ import { useSessionStore } from '@/stores/session'
 import { deleteMyAccount, exportMyData } from './api'
 
 const router = useRouter()
-const session = useSessionStore()
 
 const exporting = ref(false)
 const confirming = ref(false)
@@ -38,7 +37,7 @@ async function remove() {
   error.value = ''
   try {
     await deleteMyAccount()
-    session.logout()
+    useSessionStore().logout()
     await router.push('/login')
   } catch {
     error.value = 'No se pudo eliminar la cuenta. Inténtalo de nuevo.'
