@@ -14,9 +14,10 @@ export default defineConfig({
     },
   },
   server: {
-    // En desarrollo, /api va a la API local (npm run start:dev en RedNexus-Backend)
+    // En desarrollo, /api va a la API local (npm run start:dev en RedNexus-Backend).
+    // Si tu API corre en otro puerto: API_PROXY=http://localhost:3010 npm run dev
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': process.env.API_PROXY ?? 'http://localhost:3000',
     },
   },
 })

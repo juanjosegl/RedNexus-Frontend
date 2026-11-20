@@ -1,4 +1,3 @@
-
 // Cliente HTTP centralizado para comunicarse con la API.
 const baseUrl = import.meta.env.VITE_API_URL ?? '/api'
 
@@ -16,7 +15,8 @@ export class HttpError extends Error {
 export async function http<T>(path: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers)
 
-  if (!headers.has('Content-Type')) {
+  // Con FormData (nota de voz) el navegador pone el Content-Type con su boundary
+  if (!headers.has('Content-Type') && !(init?.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json')
   }
 
