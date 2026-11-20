@@ -1,4 +1,3 @@
-
 // Cliente HTTP centralizado para comunicarse con la API.
 const baseUrl = import.meta.env.VITE_API_URL ?? '/api'
 
@@ -49,6 +48,9 @@ export async function http<T>(path: string, init?: RequestInit): Promise<T> {
 
     throw new HttpError(message, res.status)
   }
+
+  // 204 No Content (por ejemplo, eliminar la cuenta) no trae cuerpo
+  if (res.status === 204) return undefined as T
 
   return res.json() as Promise<T>
 }
