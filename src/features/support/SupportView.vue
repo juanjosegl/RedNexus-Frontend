@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue'
 import BaseButton from '@/components/BaseButton.vue'
+import SuggestedQuestions from './SuggestedQuestions.vue'
 import BaseTextarea from '@/components/BaseTextarea.vue'
 import { askSupport, supportErrorMessage } from './api'
 import ChatMessage from './ChatMessage.vue'
@@ -54,7 +55,7 @@ defineExpose({ send })
       emparejamiento, calificaciones y normas de la comunidad.
     </p>
 
-    <!-- FE-10: aquí van las preguntas sugeridas (<SuggestedQuestions @select="send" />) -->
+    <SuggestedQuestions :disabled="sending" @select="send" />
 
     <div ref="listEl" class="chat" aria-live="polite">
       <p v-if="messages.length === 0" class="meta">
