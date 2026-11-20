@@ -4,6 +4,7 @@ import BaseAlert from '@/components/ui/BaseAlert.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
 import { getMyProfile, type Profile } from './api'
+import MyDataSection from './MyDataSection.vue'
 import ProfileForm from './ProfileForm.vue'
 
 const profile = ref<Profile | null>(null)
@@ -64,5 +65,7 @@ function onSaved(updated: Profile) {
         </button>
       </template>
     </BaseCard>
+
+    <MyDataSection v-if="profile" />
   </section>
 </template>
