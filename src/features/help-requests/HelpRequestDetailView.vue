@@ -153,7 +153,10 @@ function initial(name: string) {
       <p v-if="request.status === 'PENDING'" class="hint">
         Buscando compañeros. Esta página se actualiza sola.
       </p>
-      <EmptyState v-else-if="candidates.length === 0" message="Todavía no hay candidatos.">
+      <EmptyState
+        v-else-if="candidates.length === 0"
+        message="Nadie en la red sabe de este tema todavía. Puedes preguntarle al asistente o radicar una PQRS."
+      >
         <template #icon>
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.5" />
@@ -166,7 +169,10 @@ function initial(name: string) {
             />
           </svg>
         </template>
-        <BaseButton variant="quiet" :to="{ name: 'help-requests' }">Volver</BaseButton>
+        <BaseButton variant="secondary" :to="{ name: 'support' }"
+          >Preguntar al asistente</BaseButton
+        >
+        <BaseButton variant="secondary" :to="{ name: 'pqrs' }">Radicar una PQRS</BaseButton>
       </EmptyState>
 
       <ul v-else class="candidate-list">
