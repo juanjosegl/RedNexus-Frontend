@@ -3,6 +3,7 @@ import { flushPromises, mount, RouterLinkStub } from '@vue/test-utils'
 import { HttpError } from '@/services/http'
 import SupportView from '../SupportView.vue'
 import type { ChatTurn, SupportReply } from '../types'
+import { suggestedQuestions } from '../suggestions'
 
 const askSupport = vi.fn<(message: string, history: ChatTurn[]) => Promise<SupportReply>>()
 
@@ -73,5 +74,16 @@ describe('SupportView', () => {
     await wrapper.get('form').trigger('submit')
 
     expect(askSupport).not.toHaveBeenCalled()
+  })
+
+  it('envía una pregunta sugerida y muestra la respuesta', async () => {
+    askSupport.mockResolvedValue(reply('Puedes crear tu perfil académico.'))
+    const wrapper = mountView()
+
+    await wrapper.find('.chip').trigger('click')
+    await flushPromises()
+
+    expect(askSupport).toHaveBeenCalledWith(suggestedQuestions[0], [])
+    expect(wrapper.text()).toContain('Puedes crear tu perfil académico.')
   })
 })

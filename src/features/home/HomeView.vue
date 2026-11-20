@@ -30,6 +30,7 @@ onMounted(async () => {
     <div class="actions">
       <BaseButton :to="{ name: 'help-request-new' }">Nueva solicitud</BaseButton>
       <BaseButton variant="secondary" :to="{ name: 'help-requests' }">Mis solicitudes</BaseButton>
+      <BaseButton variant="quiet" :to="{ name: 'support' }">¿Necesitas ayuda?</BaseButton>
     </div>
     <p class="meta">
       API: <span data-testid="api-status">{{ apiStatus }}</span>
