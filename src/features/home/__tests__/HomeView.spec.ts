@@ -13,8 +13,13 @@ describe('HomeView', () => {
       history: createMemoryHistory(),
       routes: [
         { path: '/', name: 'home', component: HomeView },
-        { path: '/help-requests/new', name: 'help-request-new', component: { template: '<div />' } },
+        {
+          path: '/help-requests/new',
+          name: 'help-request-new',
+          component: { template: '<div />' },
+        },
         { path: '/help-requests', name: 'help-requests', component: { template: '<div />' } },
+        { path: '/ayuda', name: 'support', component: { template: '<div />' } },
       ],
     })
     await router.push('/')
@@ -23,5 +28,6 @@ describe('HomeView', () => {
     await flushPromises()
     expect(wrapper.get('[data-testid="api-status"]').text()).toBe('ok')
     expect(wrapper.text()).toContain('Nueva solicitud')
+    expect(wrapper.get('a[href="/ayuda"]').text()).toBe('¿Necesitas ayuda?')
   })
 })

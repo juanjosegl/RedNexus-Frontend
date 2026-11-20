@@ -3,6 +3,7 @@ import { nextTick, ref } from 'vue'
 import BaseButton from '@/components/BaseButton.vue'
 import SuggestedQuestions from './SuggestedQuestions.vue'
 import BaseTextarea from '@/components/BaseTextarea.vue'
+import FaqList from './FaqList.vue'
 import { askSupport, supportErrorMessage } from './api'
 import ChatMessage from './ChatMessage.vue'
 import type { ChatEntry } from './types'
@@ -84,7 +85,7 @@ defineExpose({ send })
       </div>
     </form>
 
-    <!-- FE-12: aquí va la lista de preguntas frecuentes (<FaqList />) -->
+    <FaqList />
   </section>
 </template>
 
