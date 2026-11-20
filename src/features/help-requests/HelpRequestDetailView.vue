@@ -4,8 +4,12 @@ import { useRoute } from 'vue-router'
 import BaseButton from '@/components/BaseButton.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
+import StarRating from '@/features/ratings/StarRating.vue'
+import { rateHelpRequest } from '@/features/ratings/api'
+import { HttpError } from '@/services/http'
+import { closeHelpRequest } from './api'
 import { devLoginAvailable, loginWithDevAccount } from './devLogin'
-import { sessionRequiredMessage } from './errors'
+import { helpRequestErrorMessage, sessionRequiredMessage } from './errors'
 import { badgeStatus, matchStatusLabel } from './statusLabels'
 import { useHelpRequestDetail } from './useHelpRequestDetail'
 
@@ -16,6 +20,51 @@ const { request, loading, error } = useHelpRequestDetail(id)
 const candidates = computed(() => request.value?.matches.slice(0, 3) ?? [])
 const needsSession = computed(() => error.value === sessionRequiredMessage)
 const entering = ref(false)
+
+// FE-07: calificar la ayuda de una solicitud aceptada
+const stars = ref(0)
+const rating = ref(false)
+const ratingError = ref('')
+const closing = ref(false)
+const acceptedHelper = computed(
+  () => request.value?.matches.find((m) => m.status === 'ACCEPTED')?.helper ?? null,
+)
+const canRate = computed(
+  () => request.value?.status === 'ACCEPTED' && !request.value.rating && acceptedHelper.value,
+)
+const canClose = computed(
+  () => request.value && request.value.status !== 'CLOSED' && request.value.status !== 'PENDING',
+)
+
+async function submitRating() {
+  if (!request.value || stars.value < 1) return
+  rating.value = true
+  ratingError.value = ''
+  try {
+    const saved = await rateHelpRequest(request.value.id, stars.value)
+    request.value.rating = { stars: saved.stars }
+  } catch (caught) {
+    ratingError.value =
+      caught instanceof HttpError && caught.status === 409
+        ? 'Ya calificaste esta ayuda.'
+        : helpRequestErrorMessage(caught)
+  } finally {
+    rating.value = false
+  }
+}
+
+async function closeRequest() {
+  if (!request.value) return
+  closing.value = true
+  try {
+    const closed = await closeHelpRequest(request.value.id)
+    request.value.status = closed.status
+  } catch (caught) {
+    error.value = helpRequestErrorMessage(caught)
+  } finally {
+    closing.value = false
+  }
+}
 
 async function enterWithDemo() {
   entering.value = true
@@ -52,7 +101,15 @@ function initial(name: string) {
     <EmptyState v-else-if="needsSession" :message="sessionRequiredMessage">
       <template #icon>
         <svg class="empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.5" />
+          <rect
+            x="5"
+            y="11"
+            width="14"
+            height="9"
+            rx="2"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
           <path
             d="M8 11V8a4 4 0 0 1 8 0v3"
             stroke="currentColor"
@@ -76,7 +133,22 @@ function initial(name: string) {
         <p v-if="request.area" class="meta">Área: {{ request.area }}</p>
         <p v-if="request.topics.length" class="meta">Temas: {{ request.topics.join(', ') }}</p>
         <p v-if="request.level" class="meta">Nivel: {{ request.level }}</p>
+        <BaseButton v-if="canClose" variant="quiet" :disabled="closing" @click="closeRequest">
+          Cerrar solicitud
+        </BaseButton>
       </article>
+
+      <article v-if="canRate" class="panel" aria-labelledby="rate-title">
+        <h2 id="rate-title">¿Cómo te ayudó {{ acceptedHelper?.name }}?</h2>
+        <p class="meta">Tu calificación mejora las recomendaciones de la IA para los demás.</p>
+        <StarRating v-model="stars" label="Calificación de la ayuda" />
+        <p v-if="ratingError" class="alert">{{ ratingError }}</p>
+        <BaseButton :disabled="stars < 1 || rating" @click="submitRating">Calificar</BaseButton>
+      </article>
+      <p v-else-if="request.rating" class="rated">
+        Calificaste la ayuda con
+        <StarRating :model-value="request.rating.stars" readonly label="Tu calificación" />
+      </p>
 
       <p v-if="request.status === 'PENDING'" class="hint">
         Buscando compañeros. Esta página se actualiza sola.
@@ -117,3 +189,12 @@ function initial(name: string) {
     </template>
   </section>
 </template>
+
+<style scoped>
+.rated {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-5);
+}
+</style>
