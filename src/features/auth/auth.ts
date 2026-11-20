@@ -17,6 +17,8 @@ export interface RegisterData {
   email: string
   password: string
   name: string
+  /** autorización del tratamiento de datos (Ley 1581); el backend exige true */
+  acceptsDataPolicy: boolean
 }
 
 export interface LoginData {

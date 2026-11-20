@@ -46,6 +46,12 @@ const router = createRouter({
       component: () => import('@/features/help-requests/HelpRequestDetailView.vue'),
     },
     {
+      path: '/ayudar',
+      name: 'incoming-matches',
+      meta: { requiresAuth: true },
+      component: () => import('@/features/matches/IncomingMatchesView.vue'),
+    },
+    {
       path: '/ayuda',
       name: 'support',
       meta: { requiresAuth: true },

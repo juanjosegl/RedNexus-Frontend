@@ -29,3 +29,13 @@ export function updateMyProfile(payload: UpdateProfilePayload) {
     body: JSON.stringify(payload),
   })
 }
+
+/** Todos mis datos en JSON (derecho de acceso, Ley 1581). */
+export function exportMyData() {
+  return http<Record<string, unknown>>('/users/me/export')
+}
+
+/** Elimina mi cuenta y todo lo asociado (derecho de supresión, Ley 1581). */
+export function deleteMyAccount() {
+  return http<void>('/users/me', { method: 'DELETE' })
+}

@@ -35,4 +35,6 @@ export interface HelpRequestMatch {
 
 export interface HelpRequestDetail extends HelpRequestSummary {
   matches: HelpRequestMatch[]
+  // null mientras no se califique (solo solicitudes aceptadas)
+  rating?: { stars: number } | null
 }
