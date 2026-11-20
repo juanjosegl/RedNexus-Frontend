@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue'
 import BaseButton from '@/components/BaseButton.vue'
+import SuggestedQuestions from './SuggestedQuestions.vue'
 import BaseTextarea from '@/components/BaseTextarea.vue'
+import FaqList from './FaqList.vue'
 import { askSupport, supportErrorMessage } from './api'
+import ChatMessage from './ChatMessage.vue'
 import type { ChatEntry } from './types'
 
 const messages = ref<ChatEntry[]>([])
@@ -53,23 +56,14 @@ defineExpose({ send })
       emparejamiento, calificaciones y normas de la comunidad.
     </p>
 
-    <!-- FE-10: aquí van las preguntas sugeridas (<SuggestedQuestions @select="send" />) -->
+    <SuggestedQuestions :disabled="sending" @select="send" />
 
     <div ref="listEl" class="chat" aria-live="polite">
       <p v-if="messages.length === 0" class="meta">
         Aún no hay mensajes. Escribe tu primera pregunta.
       </p>
 
-      <!-- FE-11: reemplazar este bloque por <ChatMessage v-for=... /> -->
-      <article
-        v-for="(entry, index) in messages"
-        :key="index"
-        class="bubble"
-        :data-role="entry.role"
-      >
-        <p class="bubble-text">{{ entry.content }}</p>
-        <p v-if="entry.sources?.length" class="meta">Fuentes: {{ entry.sources.join(', ') }}</p>
-      </article>
+      <ChatMessage v-for="(entry, index) in messages" :key="index" v-bind="entry" />
 
       <p v-if="sending" class="meta typing">El asistente está escribiendo…</p>
     </div>
@@ -91,7 +85,7 @@ defineExpose({ send })
       </div>
     </form>
 
-    <!-- FE-12: aquí va la lista de preguntas frecuentes (<FaqList />) -->
+    <FaqList />
   </section>
 </template>
 
@@ -116,25 +110,6 @@ defineExpose({ send })
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--surface);
-}
-
-.bubble {
-  max-width: 85%;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius);
-  background: var(--surface-top);
-  border: 1px solid var(--line);
-}
-
-.bubble[data-role='user'] {
-  justify-self: end;
-  background: var(--violet-tint);
-  border-color: var(--violet);
-}
-
-.bubble-text {
-  margin: 0;
-  white-space: pre-wrap;
 }
 
 .typing {
