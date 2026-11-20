@@ -54,6 +54,8 @@ async function mountView() {
     history: createMemoryHistory(),
     routes: [
       { path: '/help-requests', name: 'help-requests', component: { template: '<div />' } },
+      { path: '/ayuda', name: 'support', component: { template: '<div />' } },
+      { path: '/pqrs', name: 'pqrs', component: { template: '<div />' } },
       {
         path: '/help-requests/:id',
         name: 'help-request-detail',
@@ -121,5 +123,14 @@ describe('HelpRequestDetailView', () => {
     expect(rateHelpRequest).toHaveBeenCalledWith('request-1', 4)
     expect(wrapper.text()).toContain('Calificaste la ayuda')
     expect(wrapper.text()).not.toContain('¿Cómo te ayudó')
+  })
+
+  it('suggests the assistant and a PQRS when a request has no candidates', async () => {
+    getHelpRequest.mockResolvedValue({ ...matched, matches: [] })
+    const wrapper = await mountView()
+
+    expect(wrapper.text()).toContain('Nadie en la red sabe de este tema todavía.')
+    expect(wrapper.get('a[href="/ayuda"]').text()).toBe('Preguntar al asistente')
+    expect(wrapper.get('a[href="/pqrs"]').text()).toBe('Radicar una PQRS')
   })
 })
