@@ -78,7 +78,7 @@ describe('SupportView', () => {
 
   it('envía una pregunta sugerida y muestra la respuesta', async () => {
     askSupport.mockResolvedValue(reply('Puedes crear tu perfil académico.'))
-    const wrapper = mount(SupportView)
+    const wrapper = mountView()
 
     await wrapper.find('.chip').trigger('click')
     await flushPromises()
