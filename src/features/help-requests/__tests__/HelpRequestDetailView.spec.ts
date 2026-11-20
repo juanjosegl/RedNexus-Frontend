@@ -6,9 +6,15 @@ import HelpRequestDetailView from '../HelpRequestDetailView.vue'
 import type { HelpRequestDetail } from '../types'
 
 const getHelpRequest = vi.fn<(id: string) => Promise<HelpRequestDetail>>()
+const rateHelpRequest = vi.fn<(requestId: string, stars: number) => Promise<{ stars: number }>>()
 
 vi.mock('../api', () => ({
   getHelpRequest: (id: string) => getHelpRequest(id),
+  closeHelpRequest: vi.fn<() => Promise<void>>(),
+}))
+
+vi.mock('@/features/ratings/api', () => ({
+  rateHelpRequest: (requestId: string, stars: number) => rateHelpRequest(requestId, stars),
 }))
 
 const pending: HelpRequestDetail = {
@@ -85,5 +91,35 @@ describe('HelpRequestDetailView', () => {
     expect(wrapper.text()).toContain('Ana Gómez')
     expect(wrapper.text()).toContain('Ana encaja porque su perfil menciona joins.')
     expect(getHelpRequest).toHaveBeenCalledTimes(2)
+  })
+  it('lets the author rate an accepted request once', async () => {
+    const accepted: HelpRequestDetail = {
+      ...matched,
+      status: 'ACCEPTED',
+      rating: null,
+      matches: [
+        {
+          ...matched.matches[0]!,
+          status: 'ACCEPTED',
+          helper: { ...matched.matches[0]!.helper, email: 'ana.demo@rednexus.dev' },
+        },
+      ],
+    }
+    getHelpRequest.mockResolvedValue(accepted)
+    rateHelpRequest.mockResolvedValue({ stars: 4 })
+    const wrapper = await mountView()
+
+    expect(wrapper.text()).toContain('¿Cómo te ayudó Ana Gómez?')
+    expect(wrapper.text()).toContain('Contacto: ana.demo@rednexus.dev')
+    await wrapper.get('[aria-label="4 estrellas"]').trigger('click')
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Calificar')!
+      .trigger('click')
+    await flushPromises()
+
+    expect(rateHelpRequest).toHaveBeenCalledWith('request-1', 4)
+    expect(wrapper.text()).toContain('Calificaste la ayuda')
+    expect(wrapper.text()).not.toContain('¿Cómo te ayudó')
   })
 })
