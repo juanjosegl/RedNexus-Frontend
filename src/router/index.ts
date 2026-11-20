@@ -46,10 +46,22 @@ const router = createRouter({
       component: () => import('@/features/help-requests/HelpRequestDetailView.vue'),
     },
     {
+      path: '/ayudar',
+      name: 'incoming-matches',
+      meta: { requiresAuth: true },
+      component: () => import('@/features/matches/IncomingMatchesView.vue'),
+    },
+    {
       path: '/ayuda',
       name: 'support',
       meta: { requiresAuth: true },
       component: () => import('@/features/support/SupportView.vue'),
+    },
+    {
+      path: '/pqrs',
+      name: 'pqrs',
+      meta: { requiresAuth: true },
+      component: () => import('@/features/pqrs/PqrsView.vue'),
     },
     { path: '/solicitudes/nueva', redirect: '/help-requests/new' },
     { path: '/solicitudes/:id', redirect: (to) => `/help-requests/${String(to.params.id)}` },

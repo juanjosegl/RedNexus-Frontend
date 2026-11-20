@@ -3,6 +3,8 @@ import { onUnmounted, ref } from 'vue'
 
 const maxSeconds = 60
 
+const emit = defineEmits<{ recorded: [audio: Blob | null] }>()
+
 type RecorderStatus = 'idle' | 'recording' | 'ready' | 'denied' | 'unsupported' | 'missing'
 
 const status = ref<RecorderStatus>('idle')
@@ -28,6 +30,7 @@ function releaseStream() {
 function clearAudio() {
   if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
   audioUrl.value = null
+  emit('recorded', null)
 }
 
 function finishRecording() {
@@ -37,6 +40,7 @@ function finishRecording() {
   clearAudio()
   audioUrl.value = URL.createObjectURL(blob)
   status.value = 'ready'
+  emit('recorded', blob)
   releaseStream()
   recorder = null
 }
@@ -125,7 +129,8 @@ onUnmounted(() => {
     <p v-if="status === 'recording'" class="hint">Grabando {{ clock(seconds) }} de 1:00</p>
     <audio v-if="audioUrl" class="note-audio" :src="audioUrl" controls />
     <p v-if="status === 'ready'" class="hint">
-      Puedes escucharla. El envío de la nota todavía no está disponible.
+      Escúchala antes de publicar. Si no escribes la duda, se publica esta nota de voz y la IA la
+      transcribe.
     </p>
     <p v-else-if="status === 'idle'" class="hint">Hasta 60 segundos.</p>
     <p v-if="status === 'denied'" class="alert">

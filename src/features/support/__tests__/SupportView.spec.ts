@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { flushPromises, mount } from '@vue/test-utils'
+import { flushPromises, mount, RouterLinkStub } from '@vue/test-utils'
 import { HttpError } from '@/services/http'
 import SupportView from '../SupportView.vue'
 import type { ChatTurn, SupportReply } from '../types'
@@ -12,6 +12,10 @@ vi.mock('../api', async (importOriginal) => ({
   askSupport: (message: string, history: ChatTurn[]) => askSupport(message, history),
 }))
 
+function mountView() {
+  return mount(SupportView, { global: { stubs: { RouterLink: RouterLinkStub } } })
+}
+
 function reply(answer: string, sources: string[] = []): SupportReply {
   return { answer, sources, provider: 'mock', latencyMs: 10 }
 }
@@ -23,7 +27,7 @@ describe('SupportView', () => {
 
   it('envía la pregunta y muestra la respuesta con sus fuentes', async () => {
     askSupport.mockResolvedValue(reply('Califica de 1 a 5.', ['calificaciones.md']))
-    const wrapper = mount(SupportView)
+    const wrapper = mountView()
 
     await wrapper.get('textarea').setValue('¿Cómo califico?')
     await wrapper.get('form').trigger('submit')
@@ -37,7 +41,7 @@ describe('SupportView', () => {
 
   it('manda el historial en la segunda pregunta', async () => {
     askSupport.mockResolvedValueOnce(reply('Primera')).mockResolvedValueOnce(reply('Segunda'))
-    const wrapper = mount(SupportView)
+    const wrapper = mountView()
 
     await wrapper.get('textarea').setValue('Hola')
     await wrapper.get('form').trigger('submit')
@@ -54,7 +58,7 @@ describe('SupportView', () => {
 
   it('muestra un aviso si el asistente no está disponible', async () => {
     askSupport.mockRejectedValue(new HttpError('no disponible', 503))
-    const wrapper = mount(SupportView)
+    const wrapper = mountView()
 
     await wrapper.get('textarea').setValue('Hola')
     await wrapper.get('form').trigger('submit')
@@ -64,7 +68,7 @@ describe('SupportView', () => {
   })
 
   it('no envía preguntas vacías', async () => {
-    const wrapper = mount(SupportView)
+    const wrapper = mountView()
 
     await wrapper.get('textarea').setValue('   ')
     await wrapper.get('form').trigger('submit')
