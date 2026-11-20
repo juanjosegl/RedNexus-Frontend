@@ -51,6 +51,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
       component: () => import('@/features/support/SupportView.vue'),
     },
+    {
+      path: '/pqrs',
+      name: 'pqrs',
+      meta: { requiresAuth: true },
+      component: () => import('@/features/pqrs/PqrsView.vue'),
+    },
     { path: '/solicitudes/nueva', redirect: '/help-requests/new' },
     { path: '/solicitudes/:id', redirect: (to) => `/help-requests/${String(to.params.id)}` },
     { path: '/solicitudes', redirect: '/help-requests' },
