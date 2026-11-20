@@ -13,7 +13,7 @@ const faqs = [
   {
     question: '¿Qué pasa después de publicar?',
     answer:
-      'La solicitud muestra hasta 3 candidatos y la explicación de cada uno. Si no hay, dice «Todavía no hay candidatos.»',
+      'La solicitud muestra hasta 3 candidatos y la explicación de cada uno. Si nadie en la red sabe del tema, te sugiere preguntarle al asistente o radicar una PQRS.',
   },
   {
     question: '¿Qué significa «sin conexion» en el inicio?',
