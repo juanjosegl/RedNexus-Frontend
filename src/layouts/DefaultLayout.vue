@@ -36,6 +36,7 @@ function handleLogout() {
             <RouterLink to="/help-requests" class="nav-link" active-class="is-active">
               Solicitudes
             </RouterLink>
+            <RouterLink to="/ayudar" class="nav-link" active-class="is-active"> Ayudar </RouterLink>
             <RouterLink to="/perfil" class="nav-link" active-class="is-active">
               {{ session.user?.name ?? 'Perfil' }}
             </RouterLink>
