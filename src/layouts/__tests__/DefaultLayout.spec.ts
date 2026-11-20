@@ -50,4 +50,21 @@ describe('DefaultLayout', () => {
     const { wrapper } = mountLayout()
     expect(wrapper.text()).toContain('Contenido')
   })
+  it('muestra "Ayuda" cuando hay sesión iniciada', async () => {
+  const { wrapper, session } = mountLayout()
+  session.token = 'token-de-prueba'
+  await wrapper.vm.$nextTick()
+
+  const ayudaLink = wrapper.findAllComponents(RouterLinkStub)
+    .find(link => link.text() === 'Ayuda')
+
+  expect(ayudaLink).toBeDefined()
+  expect(ayudaLink?.props('to')).toBe('/ayuda')
+})
+
+it('no muestra "Ayuda" cuando no hay sesión', () => {
+  const { wrapper } = mountLayout()
+
+  expect(wrapper.text()).not.toContain('Ayuda')
+})
 })
