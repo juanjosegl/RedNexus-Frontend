@@ -71,7 +71,7 @@ describe('SupportView', () => {
 
     expect(askSupport).not.toHaveBeenCalled()
   })
-})
+
   it('envía una pregunta sugerida y muestra la respuesta', async () => {
     askSupport.mockResolvedValue(reply('Puedes crear tu perfil académico.'))
     const wrapper = mount(SupportView)
@@ -82,3 +82,4 @@ describe('SupportView', () => {
     expect(askSupport).toHaveBeenCalledWith(suggestedQuestions[0], [])
     expect(wrapper.text()).toContain('Puedes crear tu perfil académico.')
   })
+})

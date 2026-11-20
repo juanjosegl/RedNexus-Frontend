@@ -19,9 +19,7 @@ describe('SuggestedQuestions', () => {
 
     await wrapper.find('button').trigger('click')
 
-    expect(wrapper.emitted('select')).toEqual([
-      [suggestedQuestions[0]],
-    ])
+    expect(wrapper.emitted('select')).toEqual([[suggestedQuestions[0]]])
   })
 
   it('deshabilita los botones cuando disabled es true', () => {
@@ -29,6 +27,8 @@ describe('SuggestedQuestions', () => {
       props: { disabled: true },
     })
 
-    expect(wrapper.findAll('button').every(button => (button.element as HTMLButtonElement).disabled)).toBe(true)
+    expect(
+      wrapper.findAll('button').every((button) => (button.element as HTMLButtonElement).disabled),
+    ).toBe(true)
   })
 })
