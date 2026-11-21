@@ -135,3 +135,34 @@ jobs:
             echo "- Digest: \`$REF\`"
             echo "- Etiquetas: \`$(echo '${{ steps.meta.outputs.tags }}' | tr '\n' ' ')\`"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # PL-03: al publicar en main, pide a RedNexus-Platform el PR que despliega esta imagen en la
+      # demo GitOps (workflow "Promover imágenes"). Opcional: sin el secreto no hace nada.
+      - name: Avisar a Platform (Promover imágenes)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.PLATFORM_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::Sin PLATFORM_DISPATCH_TOKEN: corre 'Promover imágenes' a mano en RedNexus-Platform"
+            exit 0
+          fi
+          gh api repos/juanjosegl/RedNexus-Platform/dispatches -f event_type=imagen-publicada \
+            -f "client_payload[image]=rednexus-frontend" -f "client_payload[tag]=sha-${GITHUB_SHA::7}"
+
+      # Dokploy (servidor del diplomado): el stack de RedNexus-Backend/docker-compose.dokploy.yml usa
+      # esta imagen con pull_policy always; al publicar en main se pide un redespliegue.
+      # Opcional: sin el secreto (el mismo webhook que usa el backend) no hace nada.
+      - name: Redesplegar en Dokploy
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          DOKPLOY_WEBHOOK_URL: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
+        run: |
+          if [ -z "$DOKPLOY_WEBHOOK_URL" ]; then
+            echo "::notice::Sin DOKPLOY_WEBHOOK_URL: no se redespliega en Dokploy"
+            exit 0
+          fi
+          payload=$(jq -n --arg ref "$GITHUB_REF" --arg sha "$GITHUB_SHA" \
+            '{ref: $ref, after: $sha, head_commit: {id: $sha, message: "frontend"}}')
+          curl -fsS -X POST "$DOKPLOY_WEBHOOK_URL" -H 'Content-Type: application/json' \
+            -H 'X-GitHub-Event: push' -d "$payload"
