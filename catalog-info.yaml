@@ -1,0 +1,19 @@
+# PL-08: catálogo de servicios (formato de Backstage). El sistema, el equipo y la
+# infraestructura se declaran en RedNexus-Platform/catalog-info.yaml.
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: rednexus-frontend
+  title: RedNexus Frontend
+  description: Interfaz Vue 3 (registro, perfil, solicitudes por texto o voz, ayudar, calificaciones, ayuda y PQRS)
+  annotations:
+    github.com/project-slug: juanjosegl/RedNexus-Frontend
+spec:
+  type: website
+  lifecycle: production
+  owner: group:rednexus-equipo
+  system: rednexus
+  consumesApis:
+    - rednexus-api
+  dependsOn:
+    - component:rednexus-backend
