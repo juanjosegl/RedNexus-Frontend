@@ -69,3 +69,25 @@ describe('DefaultLayout', () => {
     expect(wrapper.text()).not.toContain('Ayuda')
   })
 })
+
+describe('DefaultLayout en celular (FE-16)', () => {
+  it('marca el menú con sesión para acomodarlo en dos filas', async () => {
+    const { wrapper, session } = mountLayout()
+    expect(wrapper.get('nav').classes()).not.toContain('has-session')
+
+    session.token = 'token-de-prueba'
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.get('nav').classes()).toContain('has-session')
+  })
+
+  it('deja el nombre completo en el title del enlace al perfil', async () => {
+    const { wrapper, session } = mountLayout()
+    session.token = 'token-de-prueba'
+    session.user = { id: 'u1', name: 'María Alejandra Guzmán Pérez' } as typeof session.user
+    await wrapper.vm.$nextTick()
+
+    const perfil = wrapper.get('.nav-user')
+    expect(perfil.attributes('title')).toBe('María Alejandra Guzmán Pérez')
+  })
+})
