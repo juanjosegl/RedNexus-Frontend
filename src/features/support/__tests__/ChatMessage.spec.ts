@@ -23,4 +23,28 @@ describe('ChatMessage', () => {
     expect(wrapper.text()).toContain('Asistente')
     expect(wrapper.text()).toContain('Fuentes: calificaciones.md, normas.md')
   })
+
+  it('muestra el Markdown del asistente como lista y negrita, sin interpretar HTML', () => {
+    const wrapper = mount(ChatMessage, {
+      props: {
+        role: 'assistant',
+        content: 'Pasos:\n1. Entra a **Solicitudes**.\n2. Pulsa <b>Calificar</b>.',
+      },
+    })
+
+    expect(wrapper.findAll('ol li')).toHaveLength(2)
+    expect(wrapper.find('strong').text()).toBe('Solicitudes')
+    expect(wrapper.text()).not.toContain('**')
+    expect(wrapper.find('b').exists()).toBe(false)
+    expect(wrapper.text()).toContain('<b>Calificar</b>')
+  })
+
+  it('no aplica formato a los mensajes del usuario', () => {
+    const wrapper = mount(ChatMessage, {
+      props: { role: 'user', content: 'Uso **dos asteriscos**' },
+    })
+
+    expect(wrapper.find('strong').exists()).toBe(false)
+    expect(wrapper.text()).toContain('**dos asteriscos**')
+  })
 })
