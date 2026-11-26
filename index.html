@@ -3,9 +3,18 @@
   <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="theme-color" content="#0b1020">
+    <meta name="theme-color" content="#f5f6fa" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0a0f1e" media="(prefers-color-scheme: dark)">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RedNexus</title>
+    <meta name="description" content="RedNexus: red de apoyo académico que te conecta con los compañeros que más saben de tu duda, con IA local.">
+    <title>RedNexus · Red de apoyo académico</title>
+    <script>
+      // Aplica el tema guardado antes de pintar para evitar el parpadeo (ver useTheme.ts)
+      try {
+        var t = localStorage.getItem('rednexus_theme')
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="app"></div>

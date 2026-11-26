@@ -48,6 +48,9 @@ src/
 ├── router/            # rutas
 ├── stores/            # Pinia (sesión)
 ├── services/http.ts   # cliente de la API
+├── assets/rednexus.css # sistema visual: tokens, tema claro/oscuro y clases base
+├── composables/       # useTheme (tema claro u oscuro)
+├── components/        # AppIcon, BrandLogo, botones, campos, estados vacíos
 ├── components/ui/     # componentes reutilizables
 ├── layouts/           # layouts de página
 └── features/          # una carpeta por funcionalidad del MVP
@@ -57,6 +60,17 @@ src/
     ├── matches/       # candidatos, aceptar o rechazar
     └── ratings/       # calificar la ayuda
 ```
+
+## Diseño
+
+- Todo el estilo sale de `src/assets/rednexus.css`: colores, sombras, radios y espacios son variables
+  CSS definidas con `light-dark()`, así que cada vista funciona en tema claro y oscuro sin código extra.
+- El tema sigue al sistema operativo; el botón del pie de página lo fija y se recuerda en el navegador
+  (`localStorage`, clave `rednexus_theme`).
+- Clases base: `.page-head`, `.panel`, `.card`, `.btn` (`data-variant` primary, secondary, quiet,
+  danger), `.badge` (`data-status`), `.chip`, `.tag`, `.empty`, `.alert`, `.success`, `.notice`,
+  `.split` (dos columnas en escritorio) y `.loading`.
+- Íconos: `<AppIcon name="..." />` (trazos propios, sin dependencias externas ni fuentes descargadas).
 
 ## Ramas
 

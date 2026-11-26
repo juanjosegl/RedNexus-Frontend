@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import AppIcon from '@/components/AppIcon.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { matchStatusLabel } from '@/features/help-requests/statusLabels'
@@ -26,6 +27,10 @@ function formatDate(value: string) {
     month: 'short',
     year: 'numeric',
   })
+}
+
+function percent(score: number) {
+  return `${Math.round(Math.max(0, Math.min(1, score)) * 100)} %`
 }
 
 function outcome(match: IncomingMatch) {
@@ -82,55 +87,64 @@ onMounted(load)
 <template>
   <section>
     <div class="page-head">
-      <h1>Ayudar</h1>
-      <BaseButton variant="quiet" @click="load">Actualizar</BaseButton>
+      <div>
+        <p class="eyebrow"><AppIcon name="heart" />Bandeja de ayudante</p>
+        <h1>Ayudar</h1>
+        <p class="page-sub">
+          Aquí aparecen las dudas en las que la IA te propuso como ayudante. Si aceptas, el autor
+          recibe tu correo y tú el suyo.
+        </p>
+      </div>
+      <BaseButton variant="secondary" @click="load"><AppIcon name="refresh" />Actualizar</BaseButton>
     </div>
-    <p class="hint">
-      Aquí aparecen las dudas en las que la IA te propuso como ayudante. Si aceptas, el autor recibe
-      tu correo y tú el suyo.
-    </p>
 
-    <p v-if="loading" class="hint">Cargando solicitudes…</p>
-    <p v-else-if="error" class="alert">{{ error }}</p>
+    <p v-if="loading" class="loading">Cargando solicitudes…</p>
+    <p v-else-if="error" class="alert" role="alert">{{ error }}</p>
     <EmptyState
       v-else-if="matches.length === 0"
       message="Todavía no te han propuesto como ayudante. Completa tu perfil para que la IA te encuentre."
     >
       <template #icon>
-        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linejoin="round"
-          />
-        </svg>
+        <AppIcon name="heart" class="empty-icon" />
       </template>
       <BaseButton :to="{ name: 'profile' }">Ir a mi perfil</BaseButton>
     </EmptyState>
 
     <template v-else>
-      <h2 class="section-title">Por responder ({{ pending.length }})</h2>
-      <p v-if="pending.length === 0" class="hint">No tienes solicitudes por responder.</p>
+      <h2 class="section-title">
+        Por responder <span class="count">{{ pending.length }}</span>
+      </h2>
+      <p v-if="pending.length === 0" class="empty-line hint">No tienes solicitudes por responder.</p>
       <ul class="candidate-list" aria-label="Solicitudes por responder">
-        <li v-for="match in pending" :key="match.id" class="candidate" data-testid="pending-match">
+        <li v-for="match in pending" :key="match.id" class="candidate reveal" data-testid="pending-match">
           <span class="avatar">{{ match.request.author.name.charAt(0).toUpperCase() }}</span>
           <div class="match-body">
+            <div class="match-head">
+              <p class="meta">
+                <strong>{{ match.request.author.name }}</strong> · {{ formatDate(match.createdAt) }}
+              </p>
+              <span class="meter" :title="`Puntaje: ${match.score.toFixed(2)}`">
+                Afinidad
+                <span class="meter-track" aria-hidden="true">
+                  <span class="meter-fill" :style="{ width: percent(match.score) }" />
+                </span>
+                {{ percent(match.score) }}
+              </span>
+            </div>
             <p class="text">{{ match.request.text }}</p>
-            <p class="meta">
-              {{ match.request.author.name }} · {{ formatDate(match.createdAt) }} · Puntaje:
-              {{ match.score.toFixed(2) }}
-            </p>
-            <p v-if="match.request.area" class="meta">
-              Área: {{ match.request.area }}
-              <template v-if="match.request.level"> · Nivel: {{ match.request.level }}</template>
-            </p>
+            <ul v-if="match.request.area || match.request.level" class="tags">
+              <li v-if="match.request.area" class="tag" data-tone="brand">
+                Área: {{ match.request.area }}
+              </li>
+              <li v-if="match.request.level" class="tag">Nivel: {{ match.request.level }}</li>
+            </ul>
             <p class="candidate-why">
-              {{ match.explanation ?? 'Tu perfil es cercano a esta duda.' }}
+              <AppIcon name="sparkles" />
+              <span>{{ match.explanation ?? 'Tu perfil es cercano a esta duda.' }}</span>
             </p>
 
-            <div v-if="confirming?.id === match.id" class="actions" role="group">
-              <span class="meta">
+            <div v-if="confirming?.id === match.id" class="confirm actions" role="group">
+              <span class="confirm-text">
                 {{
                   confirming.action === 'accept'
                     ? '¿Confirmas que puedes ayudar? Se compartirán los correos.'
@@ -157,17 +171,20 @@ onMounted(load)
                 No puedo
               </BaseButton>
             </div>
-            <p v-if="rowError[match.id]" class="alert">{{ rowError[match.id] }}</p>
+            <p v-if="rowError[match.id]" class="alert" role="alert">{{ rowError[match.id] }}</p>
           </div>
         </li>
       </ul>
 
-      <h2 v-if="answered.length" class="section-title">Respondidas</h2>
+      <h2 v-if="answered.length" class="section-title answered-title">
+        Respondidas <span class="count">{{ answered.length }}</span>
+      </h2>
       <ul class="candidate-list" aria-label="Solicitudes respondidas">
         <li
           v-for="match in answered"
           :key="match.id"
-          class="candidate"
+          class="candidate is-answered"
+          :data-outcome="match.status"
           data-testid="answered-match"
         >
           <span class="avatar">{{ match.request.author.name.charAt(0).toUpperCase() }}</span>
@@ -178,10 +195,15 @@ onMounted(load)
               {{ formatDate(match.createdAt) }}
             </p>
             <p v-if="match.status === 'ACCEPTED' && match.request.author.email" class="contact">
-              Contacto de {{ match.request.author.name }}:
-              <a :href="`mailto:${match.request.author.email}`">{{ match.request.author.email }}</a>
+              <AppIcon name="mail" />
+              <span
+                >Contacto de {{ match.request.author.name }}:
+                <a :href="`mailto:${match.request.author.email}`">{{
+                  match.request.author.email
+                }}</a></span
+              >
             </p>
-            <p v-if="rowError[match.id]" class="alert">{{ rowError[match.id] }}</p>
+            <p v-if="rowError[match.id]" class="alert" role="alert">{{ rowError[match.id] }}</p>
           </div>
         </li>
       </ul>
@@ -190,14 +212,17 @@ onMounted(load)
 </template>
 
 <style scoped>
-.section-title {
-  margin: var(--space-5) 0 var(--space-3);
-  font-size: 1.125rem;
+.answered-title {
+  margin-top: var(--space-6);
+}
+
+.empty-line {
+  margin-bottom: var(--space-3);
 }
 
 .match-body {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
   min-width: 0;
   flex: 1;
 }
@@ -206,8 +231,67 @@ onMounted(load)
   margin: 0;
 }
 
+.match-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.match-body .text {
+  font-size: 1.05rem;
+  font-weight: 550;
+}
+
+.confirm {
+  padding: var(--space-3);
+  border: 1px solid var(--brand-line);
+  border-radius: var(--radius);
+  background: var(--brand-tint);
+}
+
+.confirm-text {
+  flex-basis: 100%;
+  color: var(--ink);
+  font-size: 0.925rem;
+  font-weight: 550;
+}
+
+.is-answered {
+  box-shadow: none;
+  background: color-mix(in srgb, var(--surface) 75%, transparent);
+}
+
+.is-answered .avatar {
+  background: var(--neutral-bg);
+  color: var(--neutral);
+}
+
+.is-answered[data-outcome='ACCEPTED'] .avatar {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.is-answered .text {
+  font-weight: 500;
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.contact svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
 .contact a {
-  color: var(--blue-text);
   word-break: break-all;
 }
 </style>
