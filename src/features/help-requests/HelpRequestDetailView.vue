@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import AppIcon from '@/components/AppIcon.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
@@ -85,6 +86,28 @@ function formatCreatedAt(value: string) {
   })
 }
 
+function humanize(value: string) {
+  const text = value.replace(/[-_]/g, ' ')
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
+
+function percent(score: number) {
+  return `${Math.round(Math.max(0, Math.min(1, score)) * 100)} %`
+}
+
+const nextStep = computed(() => {
+  switch (request.value?.status) {
+    case 'PENDING':
+      return 'La IA está clasificando tu duda y buscando a los compañeros más cercanos.'
+    case 'MATCHED':
+      return 'Les avisamos a los compañeros sugeridos. Cuando uno acepte, verás su correo aquí.'
+    case 'ACCEPTED':
+      return 'Un compañero aceptó ayudarte. Escríbele al correo de contacto y, al terminar, califica la ayuda.'
+    default:
+      return 'Esta solicitud está cerrada. Puedes publicar una nueva cuando quieras.'
+  }
+})
+
 function initial(name: string) {
   return name.trim().charAt(0).toUpperCase()
 }
@@ -93,114 +116,223 @@ function initial(name: string) {
 <template>
   <section>
     <div class="page-head">
-      <h1>Solicitud</h1>
-      <BaseButton variant="quiet" :to="{ name: 'help-requests' }">Volver</BaseButton>
+      <div>
+        <BaseButton variant="quiet" class="is-sm back" :to="{ name: 'help-requests' }">
+          <AppIcon name="arrowLeft" />Volver
+        </BaseButton>
+        <h1>Solicitud</h1>
+      </div>
     </div>
 
-    <p v-if="loading" class="hint">Cargando solicitud…</p>
+    <p v-if="loading" class="loading">Cargando solicitud…</p>
     <EmptyState v-else-if="needsSession" :message="sessionRequiredMessage">
       <template #icon>
-        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect
-            x="5"
-            y="11"
-            width="14"
-            height="9"
-            rx="2"
-            stroke="currentColor"
-            stroke-width="1.5"
-          />
-          <path
-            d="M8 11V8a4 4 0 0 1 8 0v3"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          />
-        </svg>
+        <AppIcon name="lock" class="empty-icon" />
       </template>
       <BaseButton v-if="devLoginAvailable" :disabled="entering" @click="enterWithDemo">
         Entrar con la cuenta de prueba
       </BaseButton>
       <BaseButton v-else to="/login">Iniciar sesión</BaseButton>
     </EmptyState>
-    <p v-else-if="error && !request" class="alert">{{ error }}</p>
+    <p v-else-if="error && !request" class="alert" role="alert">{{ error }}</p>
 
-    <template v-else-if="request">
-      <article class="panel">
-        <StatusBadge :status="badgeStatus(request.status)" />
-        <p class="text">{{ request.text }}</p>
-        <p class="meta">{{ formatCreatedAt(request.createdAt) }}</p>
-        <p v-if="request.area" class="meta">Área: {{ request.area }}</p>
-        <p v-if="request.topics.length" class="meta">Temas: {{ request.topics.join(', ') }}</p>
-        <p v-if="request.level" class="meta">Nivel: {{ request.level }}</p>
-        <BaseButton v-if="canClose" variant="quiet" :disabled="closing" @click="closeRequest">
-          Cerrar solicitud
-        </BaseButton>
-      </article>
-
-      <article v-if="canRate" class="panel" aria-labelledby="rate-title">
-        <h2 id="rate-title">¿Cómo te ayudó {{ acceptedHelper?.name }}?</h2>
-        <p class="meta">Tu calificación mejora las recomendaciones de la IA para los demás.</p>
-        <StarRating v-model="stars" label="Calificación de la ayuda" />
-        <p v-if="ratingError" class="alert">{{ ratingError }}</p>
-        <BaseButton :disabled="stars < 1 || rating" @click="submitRating">Calificar</BaseButton>
-      </article>
-      <p v-else-if="request.rating" class="rated">
-        Calificaste la ayuda con
-        <StarRating :model-value="request.rating.stars" readonly label="Tu calificación" />
-      </p>
-
-      <p v-if="request.status === 'PENDING'" class="hint">
-        Buscando compañeros. Esta página se actualiza sola.
-      </p>
-      <EmptyState
-        v-else-if="candidates.length === 0"
-        message="Nadie en la red sabe de este tema todavía. Puedes preguntarle al asistente o radicar una PQRS."
-      >
-        <template #icon>
-          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.5" />
-            <circle cx="16" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5" />
-            <path
-              d="M4 19c.6-2.4 2.4-3.5 5-3.5s4.4 1.1 5 3.5M14 16.2c.7-.4 1.6-.7 2.5-.7 1.8 0 3.2.8 3.5 2.5"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-            />
-          </svg>
-        </template>
-        <BaseButton variant="secondary" :to="{ name: 'support' }"
-          >Preguntar al asistente</BaseButton
-        >
-        <BaseButton variant="secondary" :to="{ name: 'pqrs' }">Radicar una PQRS</BaseButton>
-      </EmptyState>
-
-      <ul v-else class="candidate-list">
-        <li v-for="match in candidates" :key="match.id" class="candidate">
-          <span class="avatar">{{ initial(match.helper.name) }}</span>
-          <div>
-            <p>{{ match.helper.name }}</p>
-            <p class="meta">
-              {{ matchStatusLabel(match.status) }} · Puntaje: {{ match.score.toFixed(2) }}
-            </p>
-            <p v-if="match.helper.bio" class="meta">{{ match.helper.bio }}</p>
-            <p v-if="match.helper.tags.length" class="meta">{{ match.helper.tags.join(', ') }}</p>
-            <p class="candidate-why">{{ match.explanation ?? 'Sin explicación todavía.' }}</p>
-            <p v-if="match.helper.email" class="meta">Contacto: {{ match.helper.email }}</p>
+    <div v-else-if="request" class="split detail">
+      <div class="detail-main">
+        <article class="panel request-card">
+          <div class="panel-head">
+            <StatusBadge :status="badgeStatus(request.status)" />
+            <span class="meta date"><AppIcon name="clock" />{{ formatCreatedAt(request.createdAt) }}</span>
           </div>
-        </li>
-      </ul>
+          <p class="text">{{ request.text }}</p>
+          <ul v-if="request.area || request.level || request.topics.length" class="kv">
+            <li v-if="request.area">
+              <span class="k">Área</span><span class="v">{{ humanize(request.area) }}</span>
+            </li>
+            <li v-if="request.level">
+              <span class="k">Nivel</span><span class="v">{{ humanize(request.level) }}</span>
+            </li>
+          </ul>
+          <ul v-if="request.topics.length" class="tags" aria-label="Temas">
+            <li v-for="topic in request.topics" :key="topic" class="tag" data-tone="brand">
+              {{ topic }}
+            </li>
+          </ul>
+        </article>
 
-      <p v-if="error" class="alert">{{ error }}</p>
-    </template>
+        <h2 class="section-title">
+          Compañeros sugeridos
+          <span v-if="candidates.length" class="count">{{ candidates.length }}</span>
+        </h2>
+
+        <p v-if="request.status === 'PENDING'" class="notice" role="status">
+          <span class="spinner" aria-hidden="true" />
+          Buscando compañeros. Esta página se actualiza sola.
+        </p>
+        <EmptyState
+          v-else-if="candidates.length === 0"
+          message="Nadie en la red sabe de este tema todavía. Puedes preguntarle al asistente o radicar una PQRS."
+        >
+          <template #icon>
+            <AppIcon name="users" class="empty-icon" />
+          </template>
+          <BaseButton variant="secondary" :to="{ name: 'support' }"
+            >Preguntar al asistente</BaseButton
+          >
+          <BaseButton variant="secondary" :to="{ name: 'pqrs' }">Radicar una PQRS</BaseButton>
+        </EmptyState>
+
+        <ul v-else class="candidate-list">
+          <li v-for="match in candidates" :key="match.id" class="candidate reveal">
+            <span class="avatar">{{ initial(match.helper.name) }}</span>
+            <div class="candidate-body">
+              <div class="candidate-head">
+                <div>
+                  <p class="candidate-name">{{ match.helper.name }}</p>
+                  <p class="meta">{{ matchStatusLabel(match.status) }}</p>
+                </div>
+                <span class="meter" :title="`Puntaje: ${match.score.toFixed(2)}`">
+                  Afinidad
+                  <span class="meter-track" aria-hidden="true">
+                    <span class="meter-fill" :style="{ width: percent(match.score) }" />
+                  </span>
+                  {{ percent(match.score) }}
+                </span>
+              </div>
+              <p v-if="match.helper.bio" class="meta">{{ match.helper.bio }}</p>
+              <ul v-if="match.helper.tags.length" class="tags" aria-label="Temas del compañero">
+                <li v-for="tag in match.helper.tags" :key="tag" class="tag">{{ tag }}</li>
+              </ul>
+              <p class="candidate-why">
+                <AppIcon name="sparkles" />
+                <span>{{ match.explanation ?? 'Sin explicación todavía.' }}</span>
+              </p>
+              <p v-if="match.helper.email" class="contact">
+                <AppIcon name="mail" />
+                <span
+                  >Contacto:
+                  <a :href="`mailto:${match.helper.email}`">{{ match.helper.email }}</a></span
+                >
+              </p>
+            </div>
+          </li>
+        </ul>
+
+        <p v-if="error" class="alert" role="alert">{{ error }}</p>
+      </div>
+
+      <aside class="detail-side">
+        <article v-if="canRate" class="panel" aria-labelledby="rate-title">
+          <span class="icon-tile" data-tone="warning"><AppIcon name="star" /></span>
+          <h2 id="rate-title">¿Cómo te ayudó {{ acceptedHelper?.name }}?</h2>
+          <p class="meta">Tu calificación mejora las recomendaciones de la IA para los demás.</p>
+          <StarRating v-model="stars" label="Calificación de la ayuda" />
+          <p v-if="ratingError" class="alert" role="alert">{{ ratingError }}</p>
+          <BaseButton :disabled="stars < 1 || rating" @click="submitRating">Calificar</BaseButton>
+        </article>
+        <div v-else-if="request.rating" class="panel rated">
+          <p class="meta">Calificaste la ayuda con</p>
+          <StarRating :model-value="request.rating.stars" readonly label="Tu calificación" />
+        </div>
+
+        <div class="panel side-info">
+          <h2 class="panel-title">
+            <span class="icon-tile" data-tone="blue"><AppIcon name="info" /></span>¿Qué sigue?
+          </h2>
+          <p class="meta">{{ nextStep }}</p>
+          <BaseButton
+            v-if="canClose"
+            variant="secondary"
+            class="is-sm"
+            :disabled="closing"
+            @click="closeRequest"
+          >
+            <AppIcon name="checkCircle" />Cerrar solicitud
+          </BaseButton>
+        </div>
+      </aside>
+    </div>
   </section>
 </template>
 
 <style scoped>
-.rated {
+.back {
+  margin: 0 0 var(--space-2) calc(var(--space-3) * -1);
+}
+
+.detail-main,
+.detail-side {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+}
+
+.detail-side .panel {
+  justify-items: start;
+}
+
+.detail-side .panel h2 {
+  font-size: 1.15rem;
+}
+
+.request-card {
+  gap: var(--space-4);
+}
+
+.date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--ink-faint);
+}
+
+.date svg,
+.contact svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+.notice .spinner {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.1rem;
+  border-top-color: currentColor;
+}
+
+.candidate-body {
+  display: grid;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.candidate-body p {
+  margin: 0;
+}
+
+.candidate-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.candidate-name {
+  font-weight: 650;
+  font-size: 1.05rem;
+}
+
+.contact {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin: 0 0 var(--space-5);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.rated {
+  gap: var(--space-2);
 }
 </style>
