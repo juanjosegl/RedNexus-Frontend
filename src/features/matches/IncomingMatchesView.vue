@@ -292,6 +292,6 @@ onMounted(load)
 }
 
 .contact a {
-  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 </style>

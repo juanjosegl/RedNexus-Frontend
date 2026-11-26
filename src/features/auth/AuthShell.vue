@@ -31,6 +31,11 @@ const points = [
       </p>
     </aside>
 
+    <div class="auth-intro">
+      <p class="eyebrow"><AppIcon name="sparkles" />Red de apoyo académico</p>
+      <p class="auth-intro-claim">Aprende con tus compañeros, guiado por IA.</p>
+    </div>
+
     <div class="auth-card panel">
       <div class="auth-head">
         <h1>{{ title }}</h1>
@@ -124,11 +129,44 @@ const points = [
   margin-top: 0.1rem;
 }
 
+/* En celular y tablet el panel lateral no cabe: queda una introducción corta sobre el formulario */
+.auth-intro {
+  max-width: 27rem;
+  width: 100%;
+  margin: 0 auto calc(var(--space-2) * -1);
+}
+
+.auth-intro .eyebrow {
+  margin-bottom: var(--space-1);
+}
+
+.auth-intro-claim {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 900px) {
+  .auth-intro {
+    display: none;
+  }
+}
+
 .auth-card {
   gap: var(--space-5);
   margin: 0;
   padding: clamp(1.25rem, 1rem + 2vw, 2.25rem);
   box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 899px) {
+  .auth-card {
+    width: 100%;
+    max-width: 27rem;
+    margin: 0 auto;
+  }
 }
 
 .auth-head h1 {
