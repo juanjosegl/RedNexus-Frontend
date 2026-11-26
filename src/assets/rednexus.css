@@ -121,6 +121,31 @@ html {
   text-rendering: optimizeLegibility;
 }
 
+/* Pantallas grandes y proyectores: todo está en rem, así que subir la base escala la app entera */
+@media (min-width: 1600px) {
+  html {
+    font-size: 106.25%;
+  }
+}
+
+@media (min-width: 1920px) {
+  html {
+    font-size: 112.5%;
+  }
+}
+
+@media (min-width: 2400px) {
+  html {
+    font-size: 125%;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --container: 78rem;
+  }
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -160,6 +185,20 @@ h3 {
 
 strong {
   font-weight: 650;
+}
+
+p,
+li,
+h1,
+h2,
+h3 {
+  overflow-wrap: break-word;
+}
+
+img,
+svg,
+audio {
+  max-width: 100%;
 }
 
 /* ---------- Estructura ---------- */
@@ -358,6 +397,18 @@ strong {
   margin: var(--space-2) 0 0;
 }
 
+@media (max-width: 479px) {
+  .page-head > .btn,
+  .page-head > .actions,
+  .page-head > .actions .btn {
+    flex: 1 1 100%;
+  }
+
+  .page-head {
+    margin-bottom: var(--space-4);
+  }
+}
+
 .page-sub,
 .intro,
 .lead {
@@ -525,7 +576,7 @@ strong {
   box-shadow: var(--shadow-sm);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .toolbar {
     grid-template-columns: minmax(14rem, 1fr) auto;
     align-items: end;
@@ -784,6 +835,13 @@ input[type='checkbox'] {
 
 .chips::-webkit-scrollbar {
   display: none;
+}
+
+@media (min-width: 640px) {
+  .chips {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
 }
 
 .chip {
@@ -1058,6 +1116,16 @@ input[type='checkbox'] {
   .candidate {
     padding: var(--space-4);
     gap: var(--space-3);
+  }
+
+  .candidate > .avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.9rem;
+  }
+
+  .candidate-why {
+    padding: var(--space-3);
   }
 }
 

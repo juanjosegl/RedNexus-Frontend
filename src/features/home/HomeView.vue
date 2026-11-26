@@ -218,6 +218,18 @@ onMounted(async () => {
   margin-top: var(--space-3);
 }
 
+@media (max-width: 479px) {
+  .hero .actions .btn {
+    flex: 1 1 100%;
+  }
+}
+
+@media (min-width: 1440px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+  }
+}
+
 .hero-steps {
   margin: var(--space-2) 0 var(--space-5);
   color: var(--ink-faint);
@@ -265,7 +277,7 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
-  margin: calc(var(--space-6) * -0.5) 0 0;
+  margin: calc(var(--space-5) * -0.5) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -310,17 +322,36 @@ onMounted(async () => {
   list-style: none;
 }
 
-@media (min-width: 768px) {
-  .steps {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
 .step {
   display: grid;
   gap: var(--space-2);
   align-content: start;
   padding: var(--space-5);
+}
+
+/* Tablet y celular: cada paso en una fila, ícono a la izquierda y texto a la derecha */
+@media (max-width: 959px) {
+  .step {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .step .step-top {
+    grid-row: 1 / span 2;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-1);
+    margin: 0;
+  }
+}
+
+@media (min-width: 960px) {
+  .steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .step-top {
@@ -355,7 +386,7 @@ onMounted(async () => {
   gap: var(--space-3);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 960px) {
   .shortcuts {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

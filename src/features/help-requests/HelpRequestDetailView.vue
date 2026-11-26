@@ -329,7 +329,7 @@ function initial(name: string) {
   gap: var(--space-2);
   color: var(--ink-soft);
   font-size: 0.9rem;
-  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .rated {

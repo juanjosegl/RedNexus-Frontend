@@ -150,7 +150,23 @@ function handleLogout() {
   font-weight: 550;
 }
 
-/* En pantallas medianas "Cerrar sesión" queda solo con el ícono (el texto sigue para lectores) */
+/* En pantallas medianas "Cerrar sesión" queda solo con el ícono y el perfil solo con el avatar
+   (el texto sigue para lectores de pantalla y el nombre completo en el title) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .nav-user-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .nav-user {
+    padding: 0 0.35rem;
+  }
+}
+
 @media (max-width: 1023px) {
   .nav-button-text {
     position: absolute;
