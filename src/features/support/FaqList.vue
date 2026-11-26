@@ -39,14 +39,14 @@ const faqs = [
 <style scoped>
 .faq {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .faq h2 {
-  margin: 0;
-  font-size: 1.125rem;
+  margin: 0 0 var(--space-2);
+  font-size: 1.1rem;
   line-height: 1.25;
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .faq details {
@@ -54,15 +54,25 @@ const faqs = [
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
+  transition:
+    border-color var(--move) ease,
+    background-color var(--move) ease;
+}
+
+.faq details[open] {
+  border-color: var(--brand-line);
+  background: var(--surface-2);
 }
 
 .faq summary {
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .faq p {
-  margin: var(--space-3) 0 0;
+  margin: var(--space-2) 0 0;
   color: var(--ink-soft);
+  font-size: 0.9rem;
 }
 </style>

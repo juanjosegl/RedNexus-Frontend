@@ -60,7 +60,13 @@ async function onSubmit() {
 
     <div class="field">
       <label for="profile-bio">Descripción</label>
-      <textarea id="profile-bio" v-model="bio" rows="4" class="textarea" />
+      <textarea
+        id="profile-bio"
+        v-model="bio"
+        rows="4"
+        class="textarea"
+        placeholder="Qué estudias, qué temas dominas y en qué te gusta ayudar."
+      />
     </div>
 
     <BaseInput
@@ -72,7 +78,7 @@ async function onSubmit() {
 
     <BaseAlert v-if="error" :message="error" />
 
-    <div class="actions">
+    <div class="actions form-actions">
       <button type="button" class="btn" data-variant="secondary" @click="emit('cancel')">
         Cancelar
       </button>
@@ -80,3 +86,9 @@ async function onSubmit() {
     </div>
   </form>
 </template>
+
+<style scoped>
+.form-actions {
+  justify-content: flex-end;
+}
+</style>
