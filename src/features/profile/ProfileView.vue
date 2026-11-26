@@ -127,7 +127,7 @@ function initial(name: string) {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .profile-id .meta svg {
