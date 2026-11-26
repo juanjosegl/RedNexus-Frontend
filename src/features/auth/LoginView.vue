@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
+import AuthShell from './AuthShell.vue'
 
 const router = useRouter()
 const session = useSessionStore()
@@ -23,9 +24,7 @@ async function handleLogin() {
 
     await router.push('/')
   } catch (err) {
-    error.value = err instanceof Error
-      ? err.message
-      : 'No fue posible iniciar sesión'
+    error.value = err instanceof Error ? err.message : 'No fue posible iniciar sesión'
   } finally {
     loading.value = false
   }
@@ -33,14 +32,7 @@ async function handleLogin() {
 </script>
 
 <template>
-  <section class="panel">
-    <div class="page-head">
-      <div>
-        <h1>Iniciar sesión</h1>
-        <p class="meta">Bienvenido de nuevo a RedNexus.</p>
-      </div>
-    </div>
-
+  <AuthShell title="Iniciar sesión" subtitle="Bienvenido de nuevo a RedNexus.">
     <form class="form" @submit.prevent="handleLogin">
       <div class="field">
         <label for="login-email">Correo electrónico</label>
@@ -68,16 +60,26 @@ async function handleLogin() {
         />
       </div>
 
-      <p v-if="error" class="alert">{{ error }}</p>
+      <p v-if="error" class="alert" role="alert">{{ error }}</p>
 
       <button type="submit" class="btn" data-variant="primary" :disabled="loading">
         {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
       </button>
     </form>
 
-    <p class="meta">
+    <p class="meta auth-switch">
       ¿No tienes cuenta?
       <RouterLink to="/register">Regístrate</RouterLink>
     </p>
-  </section>
+  </AuthShell>
 </template>
+
+<style scoped>
+.auth-switch {
+  text-align: center;
+}
+
+.auth-switch a {
+  font-weight: 600;
+}
+</style>

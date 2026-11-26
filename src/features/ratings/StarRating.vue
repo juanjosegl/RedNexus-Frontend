@@ -86,11 +86,21 @@ span.star {
 }
 
 .star[data-on='true'] {
-  color: #f5a524;
+  color: var(--star);
+}
+
+.star:not(span):hover {
+  transform: scale(1.12);
+}
+
+.star {
+  transition:
+    color var(--move) ease,
+    transform var(--move) ease;
 }
 
 .star:focus-visible {
-  outline: 2px solid var(--blue-text);
+  outline: 2px solid var(--brand);
   outline-offset: 2px;
   border-radius: var(--radius);
 }

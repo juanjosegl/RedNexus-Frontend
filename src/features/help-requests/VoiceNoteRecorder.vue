@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 const maxSeconds = 60
 
@@ -97,9 +98,22 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="field" aria-labelledby="voice-note-label">
-    <span id="voice-note-label" class="field-label">Nota de voz</span>
-    <div class="actions">
+  <section class="field voice" aria-labelledby="voice-note-label">
+    <div class="voice-row">
+      <span class="icon-tile" :data-tone="status === 'recording' ? 'danger' : 'violet'">
+        <AppIcon name="mic" />
+      </span>
+      <div class="voice-copy">
+        <span id="voice-note-label" class="field-label">Nota de voz</span>
+        <p v-if="status === 'recording'" class="hint recording" role="status">
+          <span class="rec-dot" aria-hidden="true" />Grabando {{ clock(seconds) }} de 1:00
+        </p>
+        <p v-else-if="status === 'ready'" class="hint">
+          Escúchala antes de publicar. Si no escribes la duda, se publica esta nota de voz y la IA
+          la transcribe.
+        </p>
+        <p v-else-if="status === 'idle'" class="hint">Hasta 60 segundos.</p>
+      </div>
       <button
         v-if="status !== 'recording'"
         type="button"
@@ -107,32 +121,14 @@ onUnmounted(() => {
         data-variant="secondary"
         @click="status === 'ready' ? recordAgain() : startRecording()"
       >
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"
-            stroke="currentColor"
-            stroke-width="1.5"
-          />
-          <path
-            d="M6 11a6 6 0 0 0 12 0M12 17v3"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          />
-        </svg>
+        <AppIcon :name="status === 'ready' ? 'refresh' : 'mic'" />
         {{ status === 'ready' ? 'Volver a grabar' : 'Grabar' }}
       </button>
-      <button v-else type="button" class="btn" data-variant="secondary" @click="stopRecording">
-        Detener
+      <button v-else type="button" class="btn" data-variant="danger" @click="stopRecording">
+        <AppIcon name="stop" />Detener
       </button>
     </div>
-    <p v-if="status === 'recording'" class="hint">Grabando {{ clock(seconds) }} de 1:00</p>
     <audio v-if="audioUrl" class="note-audio" :src="audioUrl" controls />
-    <p v-if="status === 'ready'" class="hint">
-      Escúchala antes de publicar. Si no escribes la duda, se publica esta nota de voz y la IA la
-      transcribe.
-    </p>
-    <p v-else-if="status === 'idle'" class="hint">Hasta 60 segundos.</p>
     <p v-if="status === 'denied'" class="alert">
       No hay permiso para usar el micrófono. Actívalo en el navegador e inténtalo de nuevo.
     </p>
@@ -140,3 +136,48 @@ onUnmounted(() => {
     <p v-if="status === 'unsupported'" class="alert">Este navegador no puede grabar audio.</p>
   </section>
 </template>
+
+<style scoped>
+.voice {
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.voice-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.voice-copy {
+  display: grid;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 12rem;
+}
+
+.voice .alert {
+  margin: 0;
+}
+
+.recording {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--danger);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.rec-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  animation: pulse 1s ease-in-out infinite;
+}
+</style>

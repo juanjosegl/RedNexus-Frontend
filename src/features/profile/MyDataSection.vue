@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import AppIcon from '@/components/AppIcon.vue'
 import { useSessionStore } from '@/stores/session'
 import { deleteMyAccount, exportMyData } from './api'
 
@@ -47,8 +48,10 @@ async function remove() {
 </script>
 
 <template>
-  <section class="my-data" aria-labelledby="my-data-title">
-    <h2 id="my-data-title">Mis datos</h2>
+  <section class="panel my-data" aria-labelledby="my-data-title">
+    <h2 id="my-data-title" class="panel-title">
+      <span class="icon-tile" data-tone="success"><AppIcon name="shield" /></span>Mis datos
+    </h2>
     <p class="meta">
       Por la Ley 1581 de 2012 puedes conocer todo lo que RedNexus guarda de ti y pedir que se borre.
     </p>
@@ -60,12 +63,12 @@ async function remove() {
         :disabled="exporting"
         @click="download"
       >
-        {{ exporting ? 'Preparando…' : 'Descargar mis datos' }}
+        <AppIcon name="download" />{{ exporting ? 'Preparando…' : 'Descargar mis datos' }}
       </button>
       <button
         v-if="!confirming"
         type="button"
-        class="btn"
+        class="btn delete-link"
         data-variant="quiet"
         @click="confirming = true"
       >
@@ -106,28 +109,46 @@ async function remove() {
         </button>
       </div>
     </div>
-    <p v-if="error" class="alert">{{ error }}</p>
+    <p v-if="error" class="alert" role="alert">{{ error }}</p>
   </section>
 </template>
 
 <style scoped>
 .my-data {
-  display: grid;
-  gap: var(--space-3);
-  margin-top: var(--space-5);
+  margin: 0;
 }
 
-.my-data h2,
 .my-data p {
   margin: 0;
+}
+
+.delete-link[data-variant='quiet'] {
+  color: var(--danger);
+}
+
+.delete-link[data-variant='quiet']:hover:not(:disabled) {
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 .danger {
   display: grid;
   gap: var(--space-3);
   padding: var(--space-4);
-  border: 1px solid var(--alert-line);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--danger-line);
+  border-radius: var(--radius);
   background: var(--danger-bg);
+  color: var(--ink);
+  font-size: 0.925rem;
+}
+
+.danger .btn[data-variant='primary'] {
+  background: #dc2626;
+  border-color: #b91c1c;
+  box-shadow: none;
+}
+
+.danger .btn[data-variant='primary']:hover:not(:disabled) {
+  background: #b91c1c;
 }
 </style>

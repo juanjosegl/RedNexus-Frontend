@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import AppIcon from '@/components/AppIcon.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseInput from '@/components/BaseInput.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -86,21 +87,19 @@ watch(
 <template>
   <section>
     <div class="page-head">
-      <h1>Solicitudes</h1>
-      <BaseButton :to="{ name: 'help-request-new' }">Nueva solicitud</BaseButton>
+      <div>
+        <p class="eyebrow"><AppIcon name="requests" />Tus dudas</p>
+        <h1>Solicitudes</h1>
+        <p class="page-sub">
+          Sigue el estado de cada duda y abre la solicitud para ver a los compañeros sugeridos.
+        </p>
+      </div>
+      <BaseButton :to="{ name: 'help-request-new' }"><AppIcon name="plus" />Nueva solicitud</BaseButton>
     </div>
 
     <EmptyState v-if="needsSession" :message="sessionRequiredMessage">
       <template #icon>
-        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.5" />
-          <path
-            d="M8 11V8a4 4 0 0 1 8 0v3"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          />
-        </svg>
+        <AppIcon name="lock" class="empty-icon" />
       </template>
       <BaseButton v-if="devLoginAvailable" :disabled="entering" @click="enterWithDemo">
         Entrar con la cuenta de prueba
@@ -115,6 +114,7 @@ watch(
           v-model="query"
           label="Buscar"
           placeholder="Texto de la duda"
+          type="search"
         />
         <div class="field">
           <span id="help-request-status-label" class="field-label">Estado</span>
@@ -139,14 +139,11 @@ watch(
         </div>
       </div>
 
-      <p v-if="loading" class="hint">Cargando solicitudes…</p>
-      <p v-else-if="error" class="alert">{{ error }}</p>
+      <p v-if="loading" class="loading">Cargando solicitudes…</p>
+      <p v-else-if="error" class="alert" role="alert">{{ error }}</p>
       <EmptyState v-else-if="visibleRequests.length === 0" :message="emptyMessage">
         <template #icon>
-          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.5" />
-            <path d="M16 16l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg>
+          <AppIcon name="search" class="empty-icon" />
         </template>
         <BaseButton v-if="requests.length === 0" :to="{ name: 'help-request-new' }">
           Nueva solicitud
@@ -154,19 +151,32 @@ watch(
         <BaseButton v-else variant="secondary" @click="clearFilters">Ver todas</BaseButton>
       </EmptyState>
 
-      <ul v-else class="request-list">
-        <li v-for="item in visibleRequests" :key="item.id">
-          <RouterLink
-            :to="{ name: 'help-request-detail', params: { id: item.id } }"
-            class="request-item"
-            :data-status="badgeStatus(item.status)"
-          >
-            <p class="text">{{ item.text }}</p>
-            <StatusBadge :status="badgeStatus(item.status)" />
-            <p class="meta">{{ formatCreatedAt(item.createdAt) }}</p>
-          </RouterLink>
-        </li>
-      </ul>
+      <template v-else>
+        <p class="list-count meta">
+          {{ visibleRequests.length }}
+          {{ visibleRequests.length === 1 ? 'solicitud' : 'solicitudes' }}
+        </p>
+        <ul class="request-list">
+          <li v-for="item in visibleRequests" :key="item.id">
+            <RouterLink
+              :to="{ name: 'help-request-detail', params: { id: item.id } }"
+              class="request-item"
+              :data-status="badgeStatus(item.status)"
+            >
+              <p class="text">{{ item.text }}</p>
+              <StatusBadge :status="badgeStatus(item.status)" />
+              <p class="meta"><AppIcon name="clock" />{{ formatCreatedAt(item.createdAt) }}</p>
+            </RouterLink>
+          </li>
+        </ul>
+      </template>
     </template>
   </section>
 </template>
+
+<style scoped>
+.list-count {
+  margin-bottom: var(--space-3);
+  color: var(--ink-faint);
+}
+</style>

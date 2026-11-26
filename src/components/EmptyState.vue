@@ -5,10 +5,10 @@ defineProps<{
 </script>
 
 <template>
-  <div class="empty">
+  <div class="empty reveal">
     <slot name="icon" />
     <p>{{ message }}</p>
-    <div class="actions">
+    <div v-if="$slots.default" class="actions">
       <slot />
     </div>
   </div>
